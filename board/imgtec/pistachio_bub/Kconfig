@@ -1,0 +1,12 @@
+if TARGET_PISTACHIO
+
+config SYS_BOARD
+	default "pistachio_bub"
+
+config SYS_VENDOR
+	default "imgtec"
+
+config SYS_CONFIG_NAME
+	default "pistachio"
+
+endif
