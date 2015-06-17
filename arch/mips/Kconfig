@@ -51,11 +51,17 @@ config TARGET_PB1X00
 	select SUPPORTS_CPU_MIPS32_R2
 	select SYS_MIPS_CACHE_INIT_RAM_LOAD
 
+config TARGET_PISTACHIO
+	bool "Support Pistachio"
+	select SUPPORTS_LITTLE_ENDIAN
+	select SUPPORTS_CPU_MIPS32_R1
+	select SUPPORTS_CPU_MIPS32_R2
 
 endchoice
 
 source "board/dbau1x00/Kconfig"
 source "board/imgtec/malta/Kconfig"
+source "board/imgtec/pistachio_bub/Kconfig"
 source "board/micronas/vct/Kconfig"
 source "board/pb1x00/Kconfig"
 source "board/qemu-mips/Kconfig"
