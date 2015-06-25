@@ -107,6 +107,25 @@
 #define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE                 0x20000
 
+#define CONFIG_EXTRA_ENV_SETTINGS 					\
+	"fdtaddr=0x800F0000\0"						\
+	"fdtfile=pistachio_bub.dtb\0"					\
+	"bootfile=uImage.bin\0"						\
+	"loadaddr=0x80400000\0"						\
+	"bootdir=/\0"							\
+	"usbdev=0\0"							\
+	"usbpart=0\0"							\
+	"usbboot=usb start;"						\
+	"ext4load usb $usbdev:$usbpart $fdtaddr $bootdir$fdtfile;"	\
+	"ext4load usb $usbdev:$usbpart $loadaddr $bootdir$bootfile;"	\
+	"\0"								\
+
+#define CONFIG_BOOTCOMMAND		\
+	"setenv verify n;"		\
+	"run usbboot;"			\
+	"bootm $loadaddr - $fdtaddr;"	\
+
+#define CONFIG_BOOTDELAY    0
 /*
  * Commands
  */
