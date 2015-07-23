@@ -265,6 +265,14 @@
 #define CONFIG_BOOTDELAY    2
 
 /*
+* Hash Accelerator
+*/
+
+#define CONFIG_DEV_IMGTEC_HASH
+#define HASH_BASE_ADDRESS		0x18149600
+#define HASH_WRITE_PORT			0x18101100
+
+/*
  * Commands
  */
 #include <config_cmd_default.h>
@@ -287,6 +295,7 @@
 #define CONFIG_CMD_NFS
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_PING
+#define CONFIG_CMD_HASH
 
 #define CONFIG_CMD_MMC
 
