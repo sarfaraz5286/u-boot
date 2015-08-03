@@ -1,0 +1,8 @@
+menu "SPI NAND Device Support"
+
+config MTD_SPI_NAND
+	bool "SPI NAND device support"
+	help
+	  This is the framework for the SPI NAND.
+
+endmenu
