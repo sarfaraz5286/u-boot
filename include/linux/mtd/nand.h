@@ -618,6 +618,8 @@ struct nand_buffers {
  * @ecc_step_ds:	[INTERN] ECC step required by the @ecc_strength_ds,
  *                      also from the datasheet. It is the recommended ECC step
  *			size, if known; if unknown, set to zero.
+ * @ecc.layout:		If the device has on-die ECC, it can provide its own ECC
+ * 			layout.
  * @onfi_timing_mode_default: [INTERN] default ONFI timing mode. This field is
  *			      either deduced from the datasheet if the NAND
  *			      chip is not ONFI compliant or set to 0 if it is
@@ -836,6 +838,7 @@ struct nand_flash_dev {
 	struct {
 		uint16_t strength_ds;
 		uint16_t step_ds;
+		struct nand_ecclayout *layout;
 	} ecc;
 	int onfi_timing_mode_default;
 };
