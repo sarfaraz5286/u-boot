@@ -52,7 +52,7 @@
 #define CONFIG_SYS_MEMTEST_START	0x80100000
 #define CONFIG_SYS_MEMTEST_END		0x80800000
 
-#define CONFIG_SYS_MALLOC_LEN		(128 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(1024 * 1024)
 #define CONFIG_SYS_BOOTPARAMS_LEN	(128 * 1024)
 #define CONFIG_SYS_BOOTM_LEN		(64 * 1024 * 1024)
 
@@ -101,13 +101,37 @@
 #define CONFIG_USB_STORAGE
 #define CONFIG_USB_GADGET
 
+/* Default option is NAND_BOOT */
+#define NAND_BOOT
+
+#ifdef NAND_BOOT
 /* SPFI */
 #define CONFIG_IMGTEC_SPFI
-
-#ifdef CONFIG_IMGTEC_SPFI
 #define CONFIG_SPI_FLASH
+/* NOR support */
 #define CONFIG_CMD_SF
 #define CONFIG_SPI_FLASH_WINBOND
+/* NAND support */
+#define CONFIG_MTD_SPI_NAND
+#define CONFIG_MTD_SPI_NAND_DEVICES
+#define CONFIG_SPI_NAND_GD5F
+#define CONFIG_SYS_NAND_SELF_INIT
+#define CONFIG_SYS_MAX_NAND_DEVICE	1
+#define CONFIG_SF_DEFAULT_BUS		1
+#define CONFIG_SYS_NAND_CS		1
+#define CONFIG_SYS_NAND_USE_FLASH_BBT
+#define CONFIG_CMD_NAND
+/* NAND pattitions */
+#define CONFIG_LZO
+#define CONFIG_RBTREE
+#define CONFIG_CMD_JFFS2
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_CMD_UBI
+#define CONFIG_CMD_UBIFS
+#define MTDIDS_DEFAULT                  "nand0=spi-nand"
+#define MTDPARTS_DEFAULT                "mtdparts=spi-nand:-(rootfs)"
 #endif
 
 #define CONFIG_SYS_NO_FLASH
@@ -115,25 +139,47 @@
 #define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE                 0x20000
 
+#define USB_BOOTCOMMAND							\
+	"setenv verify n;"						\
+	"usb start;"							\
+	"ext4load usb $usbdev:$usbpart $fdtaddr $bootdir$usbfdtfile;"	\
+	"ext4load usb $usbdev:$usbpart $loadaddr $bootdir$bootfile;"	\
+	"bootm $loadaddr - $fdtaddr;"
+
+#define NAND_BOOTCOMMAND						\
+	"setenv verify n;"						\
+        "mtdparts default;"						\
+	"ubi part rootfs;"						\
+	"ubifsmount ubi:rootfs;"					\
+        "ubifsload $loadaddr $botdir$bootfile;"				\
+	"ubifsload $fdtaddr $bootdir$nandfdtfile;"			\
+	"bootm $loadaddr - $fdtaddr;"
+
+#ifndef NAND_BOOT
+
+#define CONFIG_BOOTCOMMAND	USB_BOOTCOMMAND
+
+#else
+
+#define CONFIG_BOOTCOMMAND	NAND_BOOTCOMMAND
+
+#endif
+
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
 	"fdtaddr=0x800F0000\0"						\
-	"fdtfile=pistachio_bub.dtb\0"					\
+	"usbfdtfile=pistachio_bub.dtb\0"				\
+	"nandfdtfile=pistachio_bub_nand.dtb\0"				\
 	"bootfile=uImage.bin\0"						\
 	"loadaddr=0x80400000\0"						\
 	"bootdir=/\0"							\
 	"usbdev=0\0"							\
 	"usbpart=0\0"							\
-	"usbboot=usb start;"						\
-	"ext4load usb $usbdev:$usbpart $fdtaddr $bootdir$fdtfile;"	\
-	"ext4load usb $usbdev:$usbpart $loadaddr $bootdir$bootfile;"	\
-	"\0"								\
+	"usbboot="USB_BOOTCOMMAND"\0"					\
+	"nandboot="NAND_BOOTCOMMAND"\0"					\
+	"\0"
 
-#define CONFIG_BOOTCOMMAND		\
-	"setenv verify n;"		\
-	"run usbboot;"			\
-	"bootm $loadaddr - $fdtaddr;"	\
+#define CONFIG_BOOTDELAY    2
 
-#define CONFIG_BOOTDELAY    0
 /*
  * Commands
  */
