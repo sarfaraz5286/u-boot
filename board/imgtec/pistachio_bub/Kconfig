@@ -1,4 +1,4 @@
-if TARGET_PISTACHIO
+if TARGET_PISTACHIO_BUB
 
 config SYS_BOARD
 	default "pistachio_bub"
@@ -7,6 +7,19 @@ config SYS_VENDOR
 	default "imgtec"
 
 config SYS_CONFIG_NAME
-	default "pistachio"
+	default "pistachio_bub"
+
+endif
+
+if TARGET_PISTACHIO_MARDUK
+
+config SYS_BOARD
+	default "pistachio_bub"
+
+config SYS_VENDOR
+	default "imgtec"
+
+config SYS_CONFIG_NAME
+	default "pistachio_marduk"
 
 endif
