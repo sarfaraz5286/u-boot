@@ -111,6 +111,8 @@
 #define CONFIG_SPI_FLASH
 /* NOR support */
 #define CONFIG_CMD_SF
+#define CONFIG_SYS_SPI1_CS0_GPIO	0
+#define CONFIG_SYS_SPI1_CS1_GPIO	58
 #define CONFIG_SPI_FLASH_WINBOND
 /* NAND support */
 #define CONFIG_MTD_SPI_NAND
