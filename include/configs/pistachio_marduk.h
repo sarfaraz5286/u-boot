@@ -9,4 +9,11 @@
 
 #include <configs/pistachio_bub.h>
 
+#ifdef NAND_BOOT
+#ifdef CONFIG_SYS_SPI1_CS1_GPIO
+#undef CONFIG_SYS_SPI1_CS1_GPIO
+#endif /* CONFIG_SYS_SPI1_CS1_GPIO */
+#define CONFIG_SYS_SPI1_CS1_GPIO	1
+#endif /* NAND_BOOT */
+
 #endif /* _PISTACHIO_CONFIG_MARDUK_H */

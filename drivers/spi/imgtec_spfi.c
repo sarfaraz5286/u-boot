@@ -33,8 +33,8 @@
 #define GPIO_CTRL_INPUT(pin)		(GPIO_CONTROL((pin) / 16) + 0x0C)
 
 /* TODO2: Move GPIO values in board specific file */
-#define SPI1_CS0_GPIO			0
-#define SPI1_CS1_GPIO			58
+#define SPI1_CS0_GPIO			CONFIG_SYS_SPI1_CS0_GPIO
+#define SPI1_CS1_GPIO			CONFIG_SYS_SPI1_CS1_GPIO
 
 /* Functions for manipulating GPIO regs. */
 static inline void gpio_write(uint32_t addr, unsigned int pin, uint32_t value)
