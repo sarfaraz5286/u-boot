@@ -19,6 +19,7 @@
 #define CONFIG_DISPLAY_CPUINFO
 
 #define CONFIG_PISTACHIO
+#define PISTACHIO_BOARD_NAME		CONFIG_SYS_CONFIG_NAME
 #define CONFIG_BOARD_EARLY_INIT_F
 #define CONFIG_DISPLAY_BOARDINFO
 
@@ -167,8 +168,8 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
 	"fdtaddr=0x800F0000\0"						\
-	"usbfdtfile=pistachio_bub.dtb\0"				\
-	"nandfdtfile=pistachio_bub_nand.dtb\0"				\
+	"usbfdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\
+	"nandfdtfile="PISTACHIO_BOARD_NAME"_nand.dtb\0"			\
 	"bootfile=uImage.bin\0"						\
 	"loadaddr=0x80400000\0"						\
 	"bootdir=/\0"							\
