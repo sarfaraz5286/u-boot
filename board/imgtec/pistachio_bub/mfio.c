@@ -174,7 +174,7 @@ static void set_drive_strength(u32 mfio, u8 drive_strength)
 	__raw_writel(val, reg);
 }
 
-void mfio_setup_ethernet()
+void mfio_setup_ethernet(void)
 {
 	pistachio_deselectgpio_selectmfio(63, 0);
 	pistachio_deselectgpio_selectmfio(64, 0);
@@ -208,7 +208,7 @@ void mfio_setup_ethernet()
 	set_drive_strength(71, 8);
 }
 
-void mfio_setup_mmc()
+void mfio_setup_mmc(void)
 {
 	pistachio_deselectgpio_selectmfio(15, 0);
 	pistachio_deselectgpio_selectmfio(16, 0);
@@ -248,4 +248,35 @@ void mfio_setup_mmc()
 	set_drive_strength(23, 4);
 	set_drive_strength(24, 4);
 	set_drive_strength(25, 4);
+}
+
+/* Setup SPIM1 MFIOs */
+void mfio_setup_spim1(void)
+{
+	/* Use CS lines as GPIO */
+	pistachio_select_gpio(0, 0);
+	/* TODO: separate this according to board (DTS */
+	pistachio_select_gpio(1, 0);
+	pistachio_select_gpio(58, 0);
+
+	/* Use all other lines as MFIO - controlled by the SPFI block */
+	pistachio_deselectgpio_selectmfio(5, 0);
+	pistachio_deselectgpio_selectmfio(4, 0);
+	pistachio_deselectgpio_selectmfio(3, 0);
+	pistachio_deselectgpio_selectmfio(6, 0);
+	pistachio_deselectgpio_selectmfio(7, 0);
+
+	/* Set drive strength to maximum for these MFIOs */
+	set_drive_strength(5, 12);
+	set_drive_strength(4, 12);
+	set_drive_strength(3, 12);
+	set_drive_strength(6, 12);
+	set_drive_strength(7, 12);
+}
+
+
+void mfio_setup_uart1(void)
+{
+	pistachio_deselectgpio_selectmfio(59, 0);
+	pistachio_deselectgpio_selectmfio(60, 0);
 }

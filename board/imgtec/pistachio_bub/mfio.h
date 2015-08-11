@@ -178,3 +178,5 @@ struct pistachio_mfio_reg {
 
 void mfio_setup_mmc(void);
 void mfio_setup_ethernet(void);
+void mfio_setup_spim1(void);
+void mfio_setup_uart1(void);
