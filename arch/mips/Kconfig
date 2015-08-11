@@ -61,6 +61,8 @@ config TARGET_PISTACHIO_BUB
 	select SUPPORTS_CPU_MIPS32_R2
 	select DM
 	select DM_SERIAL
+	select SUPPORT_SPL
+	select SPL_DM
 
 config TARGET_PISTACHIO_MARDUK
 	bool "Support Pistachio Marduk"
@@ -69,6 +71,8 @@ config TARGET_PISTACHIO_MARDUK
 	select SUPPORTS_CPU_MIPS32_R2
 	select DM
 	select DM_SERIAL
+	select SUPPORT_SPL
+	select SPL_DM
 
 endchoice
 

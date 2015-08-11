@@ -2,7 +2,9 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-extra-y	= start.o
+ifneq ($(CONFIG_SPL_BUILD),y)
+extra-y	:= start.o
+endif
 
 obj-y	+= cpu.o
 obj-y	+= interrupts.o
