@@ -12,6 +12,7 @@
 #include <linux/sizes.h>
 #include <spl.h>
 
+#include "ddr_init.h"
 #include "lowlevel_init.h"
 
 u32 spl_boot_device(void)
@@ -36,6 +37,11 @@ u32 sb(void)
 {
 	soc_mmu_init();
 	spl_lowlevel_init();
+#if defined(CONFIG_DRAM_DDR2)
+	init_ddr2();
+#elif defined(CONFIG_DRAM_DDR3)
+	init_ddr3();
+#endif
 	board_init_r(NULL, 0);
 	spl_end();
 	return 0;

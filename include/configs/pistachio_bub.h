@@ -130,6 +130,8 @@
 #define CONFIG_SPL_TEXT_BASE		CONFIG_SYS_GRAM_BASE
 #define CONFIG_SPL_MAX_SIZE		CONFIG_SYS_GRAM_SIZE
 #define CONFIG_SPL_BSS_MAX_SIZE		0x00000400
+#define CONFIG_DRAM_DDR2
+
 /*
  * Place BSS at the end of GRAM
  * This can be placed in SRAM later on, if necessary
@@ -137,6 +139,11 @@
 #define CONFIG_SPL_BSS_START_ADDR	((CONFIG_SYS_GRAM_BASE) + \
 					(CONFIG_SYS_GRAM_SIZE) - \
 					(CONFIG_SPL_BSS_MAX_SIZE))
+/* Place dynamic allocation area before BSS */
+#define CONFIG_SYS_SPL_MALLOC_SIZE 	0X20000
+#define CONFIG_SYS_SPL_MALLOC_START 	((CONFIG_SPL_BSS_START_ADDR) -\
+					 (CONFIG_SYS_SPL_MALLOC_SIZE))
+
 #define CONFIG_SPL_LDSCRIPT		"$(CPUDIR)/u-boot-spl.lds"
 
 #define CONFIG_SYS_GENERIC_GLOBAL_DATA
