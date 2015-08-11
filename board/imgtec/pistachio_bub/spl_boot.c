@@ -11,6 +11,8 @@
 #include <common.h>
 #include <linux/sizes.h>
 
+#include "lowlevel_init.h"
+
 static void soc_mmu_init(void)
 {
 	write_c0_wired(0);
@@ -22,5 +24,7 @@ static void soc_mmu_init(void)
 u32 sb(void)
 {
 	soc_mmu_init();
+	spl_lowlevel_init();
+	spl_end();
 	return 0;
 }
