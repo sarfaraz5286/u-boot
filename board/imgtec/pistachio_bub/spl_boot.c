@@ -10,8 +10,19 @@
 #include <asm/mmu.h>
 #include <common.h>
 #include <linux/sizes.h>
+#include <spl.h>
 
 #include "lowlevel_init.h"
+
+u32 spl_boot_device(void)
+{
+	return 0;
+}
+
+void spl_board_init(void)
+{
+	preloader_console_init();
+}
 
 static void soc_mmu_init(void)
 {
@@ -25,6 +36,7 @@ u32 sb(void)
 {
 	soc_mmu_init();
 	spl_lowlevel_init();
+	board_init_r(NULL, 0);
 	spl_end();
 	return 0;
 }
