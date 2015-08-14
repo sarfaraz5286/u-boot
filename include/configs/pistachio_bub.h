@@ -103,6 +103,9 @@
 /*
  * Ethernet configuration
  */
+/* to use Pistachio specific configuration */
+#define CONFIG_PISTACHIO_DW_MAC
+
 #define CONFIG_PHYLIB
 #define CONFIG_PHY_MICREL
 #define CONFIG_MII
