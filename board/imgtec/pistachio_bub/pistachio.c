@@ -15,6 +15,8 @@
 #include <asm/pistachio.h>
 #include <asm/mipsregs.h>
 
+#include "mfio.h"
+
 phys_size_t initdram(int board_type)
 {
 	return CONFIG_SYS_MEM_SIZE;
@@ -36,12 +38,15 @@ int print_cpuinfo(void)
 
 char *addr= "01:23:45:67:89:AB";
 uchar enetaddr[6];
+
 int board_eth_init(bd_t *bs)
 {
+	mfio_setup_ethernet();
+
 	eth_parse_enetaddr(addr, enetaddr);
 	eth_setenv_enetaddr("ethaddr", enetaddr);
 
-	if (designware_initialize(CKSEG1ADDR(PISTACHIO_ETHERNET),
+	if (designware_initialize(PISTACHIO_ETHERNET,
 			PHY_INTERFACE_MODE_RMII) >= 0)
 		return 1;
 
