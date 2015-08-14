@@ -33,7 +33,6 @@
 #define CONFIG_SYS_MHZ			546
 #define CONFIG_SYS_MIPS_TIMER_FREQ	(CONFIG_SYS_MHZ * 1000000)
 
-#define CONFIG_SYS_CACHELINE_SIZE	32
 #define CONFIG_PHYS_TO_BUS
 
 #define CONFIG_OF_LIBFDT
@@ -105,18 +104,18 @@
  * Ethernet configuration
  */
 #define CONFIG_PHYLIB
+#define CONFIG_PHY_MICREL
+#define CONFIG_MII
+#define CONFIG_AUTONEG_TIMEOUT		(150 * CONFIG_SYS_HZ)
 #define CONFIG_ETH_DESIGNWARE
+
+#define	CONFIG_SYS_RX_ETH_BUFFER	16
 
 /*
  * USB configuration
  */
-#define CONFIG_USB_DWC2_REG_ADDR	CKSEG1ADDR(PISTACHIO_USB)
+#define CONFIG_USB_DWC2_REG_ADDR	(PISTACHIO_USB)
 #define CONFIG_USB_DWC2
-
-/* USB Storage */
-#define CONFIG_USB_DEVICE
-#define CONFIG_USB_STORAGE
-#define CONFIG_USB_GADGET
 
 /* Default option is NAND_BOOT */
 #define NAND_BOOT
@@ -152,6 +151,22 @@
 #define MTDIDS_DEFAULT                  "nand0=spi-nand"
 #define MTDPARTS_DEFAULT                "mtdparts=spi-nand:-(rootfs)"
 #endif
+
+/* MMC - Sdhost */
+#define CONFIG_MMC
+#define CONFIG_GENERIC_MMC
+#define CONFIG_DWMMC
+#define CONFIG_BOUNCE_BUFFER
+
+#define HAVE_BLOCK_DEVICE
+#define CONFIG_PARTITION_UUIDS
+#define CONFIG_CMD_FAT
+#define CONFIG_CMD_EXT3
+#define CONFIG_CMD_EXT4
+#define CONFIG_DOS_PARTITION
+#define CONFIG_ISO_PARTITION
+#define CONFIG_FS_EXT4
+#define CONFIG_FS_FAT
 
 #define CONFIG_SYS_NO_FLASH
 
@@ -209,23 +224,21 @@
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_NFS
 
-
-#define CONFIG_CMD_USB
-
-#define CONFIG_CMD_DHCP
 #define CONFIG_CMD_ELF
-#define CONFIG_CMD_PING
 
-#define CONFIG_CMD_NET
+#define CONFIG_CMD_DNS
+#define CONFIG_BOOTP_DNS
+#define CONFIG_BOOTP_DNS2
+#define CONFIG_BOOTP_GATEWAY
+#define CONFIG_BOOTP_HOSTNAME
+#define CONFIG_BOOTP_SUBNETMASK
+#define CONFIG_BOOTP_SEND_HOSTNAME
 
 #define CONFIG_CMD_NFS
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_PING
 
-#define CONFIG_CMD_FAT
-#define CONFIG_CMD_EXT3
-#define CONFIG_CMD_EXT4
-#define CONFIG_DOS_PARTITION
+#define CONFIG_CMD_MMC
 
 #define CONFIG_SYS_LONGHELP		/* verbose help, undef to save memory */
 
