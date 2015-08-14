@@ -46,9 +46,11 @@ int board_eth_init(bd_t *bs)
 	eth_parse_enetaddr(addr, enetaddr);
 	eth_setenv_enetaddr("ethaddr", enetaddr);
 
+#ifndef CONFIG_DM_ETH
 	if (designware_initialize(PISTACHIO_ETHERNET,
 			PHY_INTERFACE_MODE_RMII) >= 0)
 		return 1;
+#endif
 
 	return 0;
 }
@@ -67,7 +69,9 @@ int misc_init_r(void)
 	return 0;
 }
 
+#ifndef DM_SERIAL
 struct serial_device *default_serial_console(void)
 {
 	return &eserial2_device;
 }
+#endif
