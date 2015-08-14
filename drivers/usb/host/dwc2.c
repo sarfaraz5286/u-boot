@@ -12,7 +12,7 @@
 #include <phys2bus.h>
 #include <usbroothubdes.h>
 #include <asm/io.h>
-#include <asm/addrspace.h>
+
 #include "dwc2.h"
 
 /* Use only HC channel 0. */
@@ -803,8 +803,7 @@ int chunk_msg(struct usb_device *dev, unsigned long pipe, int *pid, int in,
 		       &hc_regs->hctsiz);
 
 		if (!in)
-			memcpy((void*)(CKSEG1ADDR(aligned_buffer)),
-			(char *)buffer + done, len);
+			memcpy(aligned_buffer, (char *)buffer + done, len);
 
 		writel(phys_to_bus((unsigned long)aligned_buffer),
 		       &hc_regs->hcdma);
@@ -821,8 +820,7 @@ int chunk_msg(struct usb_device *dev, unsigned long pipe, int *pid, int in,
 
 		if (in) {
 			xfer_len -= sub;
-			memcpy(buffer + done, (void *)CKSEG1ADDR(aligned_buffer),
-					xfer_len);
+			memcpy(buffer + done, aligned_buffer, xfer_len);
 			if (sub)
 				stop_transfer = 1;
 		}
