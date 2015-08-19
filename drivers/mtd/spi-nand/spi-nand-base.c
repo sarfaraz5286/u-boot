@@ -478,6 +478,8 @@ int spi_nand_register(struct spi_nand *snand, struct nand_flash_dev *flash_ids)
 	/* Preallocate buffer for flash identification (NAND_CMD_READID) */
 	snand->buf_size = SPI_NAND_CMD_BUF_LEN;
 	snand->data_buf = kmalloc(snand->buf_size, GFP_KERNEL);
+	if (!snand->data_buf)
+		return -ENOMEM;
 
 	ret = nand_scan_ident(mtd, 1, flash_ids);
 	if (ret)
