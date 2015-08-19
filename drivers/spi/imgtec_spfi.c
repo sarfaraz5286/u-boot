@@ -25,7 +25,7 @@
  * TODO1: Use pin control driver functionality when available and
  *       remove existing temporary GPIO helper functions
  */
-#define GPIO_BASE			0xB8101C00
+#define GPIO_BASE			0x18101C00
 #define GPIO_CONTROL(bank)		((GPIO_BASE) + 0x200 + ((bank) * 0x24))
 #define GPIO_CTRL_BIT_EN(pin)		(GPIO_CONTROL((pin) / 16) + 0x00)
 #define GPIO_CTRL_OUTPUT_EN(pin)	(GPIO_CONTROL((pin) / 16) + 0x04)
@@ -68,7 +68,7 @@ static inline void gpio_direction_output(unsigned int pin)
 	(((val) << (field##_SHIFT)) & (field##_MASK)))	\
 )
 
-#define IMG_SPIM_BASE_ADDRESS(i)	(0xB8100F00 + (0x100 * (i)))
+#define IMG_SPIM_BASE_ADDRESS(i)	(0x18100F00 + (0x100 * (i)))
 #define SPI0_BUS			0
 #define SPI1_BUS			1
 
