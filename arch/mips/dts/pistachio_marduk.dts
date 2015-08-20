@@ -15,12 +15,14 @@
 	compatible = "img,pistachio-marduk", "img,pistachio";
 
 	aliases {
+		console ="/uart@18101500";
 		serial0 = &uart0;
 		serial1 = &uart1;
 	};
 
 	chosen {
 		bootargs = "console=ttyS1,115200n8 earlycon=uart8250,mmio32,0x18101500,115200 root=/dev/sda1 rootwait ro";
+		stdout-path = &uart1;
 	};
 
 	memory {
