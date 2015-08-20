@@ -203,11 +203,11 @@
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
-	"fdtaddr=0x800F0000\0"						\
-	"usbfdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\
+	"fdtaddr=0x000F0000\0"						\
+	"usbfdtfile="PISTACHIO_BOARD_NAME".dtb\0"			\
 	"nandfdtfile="PISTACHIO_BOARD_NAME"_nand.dtb\0"			\
 	"bootfile=uImage.bin\0"						\
-	"loadaddr=0x80400000\0"						\
+	"loadaddr=0x00400000\0"						\
 	"bootdir=/\0"							\
 	"usbdev=0\0"							\
 	"usbpart=0\0"							\
