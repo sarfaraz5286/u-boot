@@ -24,9 +24,6 @@
 #define CONFIG_DISPLAY_BOARDINFO
 
 #define CONFIG_OF_LIBFDT
-
-#define CONFIG_MISC_INIT_R
-
 /*
  * CPU Configuration
  */
@@ -34,8 +31,6 @@
 #define CONFIG_SYS_MIPS_TIMER_FREQ	(CONFIG_SYS_MHZ * 1000000)
 
 #define CONFIG_PHYS_TO_BUS
-
-#define CONFIG_OF_LIBFDT
 
 /*
  * Memory map
