@@ -19,6 +19,7 @@
 		console ="/uart@18101500";
 		serial0 = &uart0;
 		serial1 = &uart1;
+		ethernet0 = &enet;
 	};
 
 	chosen {
