@@ -7,6 +7,7 @@
 
 #include <common.h>
 #include <dwmmc.h>
+#include <fdtdec.h>
 #include <miiphy.h>
 #include <malloc.h>
 #include <netdev.h>
@@ -19,9 +20,27 @@
 
 #include "mfio.h"
 
+DECLARE_GLOBAL_DATA_PTR;
+
 phys_size_t initdram(int board_type)
 {
+#ifdef CONFIG_OF_CONTROL
+	int node;
+	fdt_addr_t addr;
+        fdt_size_t size;
+
+	node  = fdt_path_offset(gd->fdt_blob, "/memory");
+	addr = fdtdec_get_addr_size(gd->fdt_blob, node, "reg", &size);
+	if (addr == FDT_ADDR_T_NONE || size == 0) {
+		printf("\n DRAM: Can't get mem size\n");
+		return -1;
+	}
+
+	return (phys_size_t)size;
+#else
 	return CONFIG_SYS_MEM_SIZE;
+#endif
+
 }
 
 int checkboard(void)
