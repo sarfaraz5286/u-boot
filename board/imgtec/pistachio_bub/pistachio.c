@@ -21,6 +21,7 @@
 #include "mfio.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+char *enet_dtb_macaddr = 0;
 
 phys_size_t initdram(int board_type)
 {
@@ -57,15 +58,46 @@ int print_cpuinfo(void)
 	return 0;
 }
 
-char *addr= "01:23:45:67:89:AB";
-uchar enetaddr[6];
+static const char *get_dtb_macaddr(u32 ifno)
+{
+	int node, len;
+	char enet[16];
+	const char *mac, *path;
+
+	node = fdt_path_offset(gd->fdt_blob, "/aliases");
+	if (node < 0) {
+		printf("\n enet0: no /aliases found in dtb \n");
+		return NULL;
+	}
+
+	sprintf(enet, "ethernet%d", ifno);
+	path = fdt_getprop(gd->fdt_blob, node, enet, NULL);
+	if (!path) {
+		printf("enet0: enet0 alias not found \n");
+		return NULL;
+	}
+
+	node = fdt_path_offset(gd->fdt_blob, path);
+	mac = fdt_getprop(gd->fdt_blob, node, "mac-address", &len);
+	if (mac && is_valid_ethaddr((u8 *)mac))
+		return mac;
+
+        return NULL;
+}
 
 int board_eth_init(bd_t *bs)
 {
 	mfio_setup_ethernet();
 
-	eth_parse_enetaddr(addr, enetaddr);
-	eth_setenv_enetaddr("ethaddr", enetaddr);
+	/* try to get a valid macaddr from dtb */
+#ifdef CONFIG_OF_CONTROL
+	enet_dtb_macaddr = get_dtb_macaddr(0);
+
+	if (enet_dtb_macaddr)
+		eth_setenv_enetaddr("ethaddr", (u8 *)enet_dtb_macaddr);
+	else
+		printf("No valid Mac-addr found from dtb\n");
+#endif
 
 #ifndef CONFIG_DM_ETH
 	if (designware_initialize(PISTACHIO_ETHERNET,
