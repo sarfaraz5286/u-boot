@@ -7,10 +7,20 @@
  */
 
 #include <asm/mipsregs.h>
+#include <asm/mmu.h>
 #include <common.h>
+#include <linux/sizes.h>
+
+static void soc_mmu_init(void)
+{
+	write_c0_wired(0);
+	/* Map SOC registers only; DRAM will be mapped later */
+	assert(!identity_map((u32)CONFIG_SYS_SOC_REG_BASE,
+			     CONFIG_SYS_SOC_REG_SIZE, C0_ENTRYLO_UC));
+}
 
 u32 sb(void)
 {
-	/* Nothing to do for the moment */
+	soc_mmu_init();
 	return 0;
 }

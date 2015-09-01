@@ -3,5 +3,7 @@
 #
 
 ifeq ($(CONFIG_SPL_BUILD),y)
-extra-y	:= start.o
+extra-y			:= start.o
 endif
+
+obj-y			+= mmu.o
