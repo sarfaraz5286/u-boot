@@ -188,6 +188,10 @@ reset:
 	sw	sp, 0(t0)
 #endif
 
+#ifdef CONFIG_IGNORE_BOOT_FLAG
+	move	a0, zero
+#endif
+
 	PTR_LA	t9, board_init_f
 	jr	t9
 	 move	ra, zero

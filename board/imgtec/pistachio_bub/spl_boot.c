@@ -17,12 +17,13 @@
 
 u32 spl_boot_device(void)
 {
-	return 0;
+	return BOOT_DEVICE_SPI;
 }
 
 void spl_board_init(void)
 {
 	preloader_console_init();
+	spl_image.flags = 0;
 }
 
 static void soc_mmu_init(void)
