@@ -15,13 +15,32 @@
 
 #include <asm/addrspace.h>
 #include <asm/io.h>
-#include <asm/pistachio.h>
+#include <asm/mmu.h>
 #include <asm/mipsregs.h>
+#include <asm/pistachio.h>
+#include <asm-generic/sections.h>
 
 #include "mfio.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 char *enet_dtb_macaddr = 0;
+
+int reloc_tlb_fixup(void)
+{
+	u32 text_start, text_size, data_start, data_size;
+
+	text_start = (u32)gd->relocaddr;
+	text_size = (u32)__text_end - (u32)__text_start;
+	data_start = text_start + text_size;
+	data_size = gd->ram_top - data_start;
+
+	assert(!identity_map((u32)text_start, text_size, C0_ENTRYLO_WB));
+	assert(!identity_map((u32)data_start, data_size, C0_ENTRYLO_UC));
+	assert(!identity_map((u32)text_start - CONFIG_SYS_BOOTM_LEN,
+		CONFIG_SYS_BOOTM_LEN, C0_ENTRYLO_UC));
+
+	return 0;
+}
 
 phys_size_t initdram(int board_type)
 {

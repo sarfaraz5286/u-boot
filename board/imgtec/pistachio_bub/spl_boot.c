@@ -28,10 +28,13 @@ void spl_board_init(void)
 
 static void soc_mmu_init(void)
 {
+	u32 header_mem_reserved = 1 * 1024 * 1024;
+
 	write_c0_wired(0);
-	/* Map SOC registers only; DRAM will be mapped later */
 	assert(!identity_map((u32)CONFIG_SYS_SOC_REG_BASE,
 			     CONFIG_SYS_SOC_REG_SIZE, C0_ENTRYLO_UC));
+	assert(!identity_map((u32)CONFIG_SYS_TEXT_BASE - header_mem_reserved,
+			CONFIG_UBOOT_MEM_MAX, C0_ENTRYLO_WB));
 }
 
 u32 sb(void)

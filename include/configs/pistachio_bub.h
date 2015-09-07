@@ -43,6 +43,7 @@
 #define CONFIG_SYS_SOC_REG_SIZE		0x00440000
 
 #define CONFIG_SYS_TEXT_BASE		0x00400000
+#define CONFIG_UBOOT_MEM_MAX		0x01000000
 #define CONFIG_FDT_START_ADDR		0x00490000
 #define CONFIG_FDT_OFFSET		0x00090000
 
@@ -257,12 +258,12 @@
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
-	"fdtaddr=0x000F0000\0"						\
+	"fdtaddr=0x0D000000\0"						\
 	"usbfdtfile="PISTACHIO_BOARD_NAME".dtb\0"			\
 	"mmcfdtfile="PISTACHIO_BOARD_NAME".dtb\0"			\
 	"nandfdtfile="PISTACHIO_BOARD_NAME"_nand.dtb\0"			\
 	"bootfile=uImage.bin\0"						\
-	"loadaddr=0x00400000\0"						\
+	"loadaddr=0x0E000000\0"						\
 	"bootdir=/\0"							\
 	"usbdev=0\0"							\
 	"usbpart=0\0"							\
