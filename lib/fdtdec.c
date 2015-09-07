@@ -1139,8 +1139,12 @@ int fdtdec_setup(void)
 	gd->fdt_blob = __dtb_dt_begin;
 # elif defined CONFIG_OF_SEPARATE
 #  ifdef CONFIG_SPL_BUILD
+#    ifdef CONFIG_SPL_FDT_START_ADDR
+	gd->fdt_blob = (ulong *)CONFIG_SPL_FDT_START_ADDR;
+#else
 	/* FDT is at end of BSS */
 	gd->fdt_blob = (ulong *)&__bss_end;
+#endif
 #  else
 	/* FDT is at end of image */
 	gd->fdt_blob = (ulong *)&_end;
