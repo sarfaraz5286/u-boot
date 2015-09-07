@@ -16,4 +16,9 @@
 #define CONFIG_SYS_SPI1_CS1_GPIO	1
 #endif /* NAND_BOOT */
 
+#ifdef CONFIG_DRAM_DDR2
+#undef CONFIG_DRAM_DDR2
+#endif
+#define CONFIG_DRAM_DDR3
+
 #endif /* _PISTACHIO_CONFIG_MARDUK_H */
