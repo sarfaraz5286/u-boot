@@ -92,6 +92,7 @@ __weak void yellow_led_on(void) {}
 __weak void yellow_led_off(void) {}
 __weak void blue_led_on(void) {}
 __weak void blue_led_off(void) {}
+__weak int reloc_tlb_fixup(void) { return 0; }
 
 /*
  * Why is gd allocated a register? Prior to reloc it might be better to
@@ -921,6 +922,9 @@ static init_fnc_t init_sequence_f[] = {
 #endif
 #if !defined(CONFIG_BLACKFIN) && !defined(CONFIG_NIOS2)
 	reserve_uboot,
+#endif
+#ifdef CONFIG_MIPS
+	reloc_tlb_fixup,
 #endif
 #ifndef CONFIG_SPL_BUILD
 	reserve_malloc,
