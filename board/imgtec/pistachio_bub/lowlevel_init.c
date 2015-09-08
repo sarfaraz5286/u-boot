@@ -53,7 +53,7 @@ void spl_lowlevel_init(void) {
 	 */
 	uart1_clk_setup(4, 75);
 	mfio_setup_uart1();
-	eth_clk_setup(0, 7);
+	eth_clk_setup(0, 6);
 	rom_clk_setup(1);
 	usb_clk_setup(6, 2, 7);
 }
