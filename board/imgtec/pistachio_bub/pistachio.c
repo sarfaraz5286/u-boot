@@ -23,7 +23,7 @@
 #include "mfio.h"
 
 DECLARE_GLOBAL_DATA_PTR;
-char *enet_dtb_macaddr = 0;
+const char *enet_dtb_macaddr = 0;
 
 int reloc_tlb_fixup(void)
 {
@@ -77,6 +77,7 @@ int print_cpuinfo(void)
 	return 0;
 }
 
+#ifdef CONFIG_OF_CONTROL
 static const char *get_dtb_macaddr(u32 ifno)
 {
 	int node, len;
@@ -103,6 +104,7 @@ static const char *get_dtb_macaddr(u32 ifno)
 
         return NULL;
 }
+#endif
 
 int board_eth_init(bd_t *bs)
 {

@@ -18,7 +18,7 @@ struct spi_nand {
 	struct mtd_info		*mtd;
 	struct nand_chip	nand_chip;
 	struct device		*dev;
-	const char		*name;
+	char			*name;
 
 	u8			*buf, *data_buf;
 	size_t			buf_size;

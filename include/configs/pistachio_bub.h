@@ -227,14 +227,19 @@
 #define USB_BOOTCOMMAND							\
 	"setenv verify n;"						\
 	"usb start;"							\
-	"ext4load usb $usbdev:$usbpart $fdtaddr $bootdir$usbfdtfile;"	\
-	"ext4load usb $usbdev:$usbpart $loadaddr $bootdir$bootfile;"	\
+	"ext4load usb $usbdev $fdtaddr $bootdir$fdtfile;"		\
+	"ext4load usb $usbdev $loadaddr $bootdir$bootfile;"		\
+	"bootm $loadaddr - $fdtaddr;"
+
+#define ETH_BOOTCOMMAND							\
+	"setenv verify n;"						\
+	"dhcp $loadaddr $bootfile; dhcp $fdtaddr $fdtfile;"		\
 	"bootm $loadaddr - $fdtaddr;"
 
 #define MMC_BOOTCOMMAND							\
 	"setenv verify n;"						\
 	"mmcinfo; mmc dev $mmcdev;"					\
-	"ext4load mmc $mmcdev $fdtaddr $bootdir$mmcfdtfile;"		\
+	"ext4load mmc $mmcdev $fdtaddr $bootdir$fdtfile;"		\
 	"ext4load mmc $mmcdev $loadaddr $bootdir$bootfile;"		\
 	"bootm $loadaddr - $fdtaddr;"
 
@@ -259,8 +264,7 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
 	"fdtaddr=0x0D000000\0"						\
-	"usbfdtfile="PISTACHIO_BOARD_NAME".dtb\0"			\
-	"mmcfdtfile="PISTACHIO_BOARD_NAME".dtb\0"			\
+	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"			\
 	"nandfdtfile="PISTACHIO_BOARD_NAME"_nand.dtb\0"			\
 	"bootfile=uImage.bin\0"						\
 	"loadaddr=0x0E000000\0"						\
@@ -271,6 +275,7 @@
 	"usbboot="USB_BOOTCOMMAND"\0"					\
 	"mmcboot="MMC_BOOTCOMMAND"\0"					\
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
+	"ethboot="ETH_BOOTCOMMAND"\0"					\
 	"\0"
 
 #define CONFIG_BOOTDELAY    2
