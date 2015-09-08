@@ -28,13 +28,25 @@ void spl_board_init(void)
 
 static void soc_mmu_init(void)
 {
+	/*
+	 * Reserve 1MB before the location where U-Boot will be executed
+	 * for the header. U-Boot will be loaded together with header
+	 * in a way that places the beginning of the text segment at
+	 * CONFIG_SYS_TEXT_BASE, having the header at lower addresses.
+	 */
 	u32 header_mem_reserved = 1 * 1024 * 1024;
 
 	write_c0_wired(0);
 	assert(!identity_map((u32)CONFIG_SYS_SOC_REG_BASE,
 			     CONFIG_SYS_SOC_REG_SIZE, C0_ENTRYLO_UC));
+	/*
+	 * Map the u-boot code and data used before relocation
+	 * The memory before CONFIG_SYS_TEXT_BASE -header_mem_reserved
+         * is kept unmapped as NULL guard
+	 */
 	assert(!identity_map((u32)CONFIG_SYS_TEXT_BASE - header_mem_reserved,
-			CONFIG_UBOOT_MEM_MAX, C0_ENTRYLO_WB));
+			CONFIG_UBOOT_EARLY_MEM + header_mem_reserved,
+			C0_ENTRYLO_WB));
 }
 
 u32 sb(void)

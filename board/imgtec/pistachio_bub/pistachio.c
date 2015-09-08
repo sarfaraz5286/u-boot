@@ -28,16 +28,21 @@ const char *enet_dtb_macaddr = 0;
 int reloc_tlb_fixup(void)
 {
 	u32 text_start, text_size, data_start, data_size;
+	u32 early_mem_start, remaining_unmapped;
 
 	text_start = (u32)gd->relocaddr;
 	text_size = (u32)__text_end - (u32)__text_start;
 	data_start = text_start + text_size;
 	data_size = gd->ram_top - data_start;
+	early_mem_start = CONFIG_SYS_TEXT_BASE + CONFIG_UBOOT_EARLY_MEM;
+	remaining_unmapped = text_start - early_mem_start;
 
+	/* Text segment is maped cached */
 	assert(!identity_map((u32)text_start, text_size, C0_ENTRYLO_WB));
+	/* All data sections are mapped uncached to have DMA coherency */
 	assert(!identity_map((u32)data_start, data_size, C0_ENTRYLO_UC));
-	assert(!identity_map((u32)text_start - CONFIG_SYS_BOOTM_LEN,
-		CONFIG_SYS_BOOTM_LEN, C0_ENTRYLO_UC));
+	assert(!identity_map((u32)early_mem_start, remaining_unmapped,
+		C0_ENTRYLO_UC));
 
 	return 0;
 }
