@@ -148,7 +148,7 @@
 #define CONFIG_SYS_SPL_MALLOC_START 	((CONFIG_SYS_GRAM_BASE) + \
 					(CONFIG_SPL_MAX_SIZE))
 
-#define CONFIG_SPL_LDSCRIPT		"$(CPUDIR)/u-boot-spl.lds"
+#define CONFIG_SPL_LDSCRIPT		"arch/mips/cpu/u-boot.lds"
 
 #ifdef NAND_BOOT
 /* SPFI */
