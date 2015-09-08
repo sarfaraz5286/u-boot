@@ -11,11 +11,6 @@
 
 #define DDR_TIMEOUT			-1
 
-#ifdef CONFIG_DRAM_DDR2
-int init_ddr2(void);
-#endif
-#ifdef CONFIG_DRAM_DDR3
-int init_ddr3(void);
-#endif
+int init_ddr(void);
 
 #endif

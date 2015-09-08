@@ -12,9 +12,11 @@
 #include <linux/sizes.h>
 #include <spl.h>
 
+#include "clocks.h"
 #include "ddr_init.h"
-#include "lowlevel_init.h"
+#include "mfio.h"
 
+#ifdef CONFIG_SPL_BUILD
 u32 spl_boot_device(void)
 {
 	return BOOT_DEVICE_SPI;
@@ -26,7 +28,47 @@ void spl_board_init(void)
 	spl_image.flags = 0;
 }
 
-static void soc_mmu_init(void)
+void spl_lowlevel_init(void) {
+	int ret;
+
+	/*
+	 * System PLL divided by 2 -> 350 MHz
+	 * The same frequency will be the input frequency for the SPFI block
+	 */
+	system_clk_setup(1);
+
+	/*
+	 * MIPS CPU dividers: division by 1 -> 546 MHz
+	 * This is set up as we cannot make any assumption about
+	 * the values set or not by the boot ROM code
+	 */
+	mips_clk_setup(0, 0);
+
+	/* Setup system PLL at 700 MHz */
+	ret = sys_pll_setup(2, 1, 13, 350);
+	if (ret != CLOCKS_OK)
+		return;
+
+	/* Setup MIPS PLL at 546 MHz */
+	ret = mips_pll_setup(2, 1, 1, 21);
+	if (ret != CLOCKS_OK)
+		return;
+
+	/* Setup SPIM1 MFIOs */
+	mfio_setup_spim1();
+
+	/*
+	 * Setup UART1 clock and MFIOs
+	 * System PLL divided by 5 divided by 76 -> 1.8421 Mhz
+	 */
+	uart1_clk_setup(4, 75);
+	mfio_setup_uart1();
+	eth_clk_setup(0, 6);
+	rom_clk_setup(1);
+	usb_clk_setup(6, 2, 7);
+}
+
+void board_init_f(ulong bootflag)
 {
 	/*
 	 * Reserve 1MB before the location where U-Boot will be executed
@@ -47,18 +89,9 @@ static void soc_mmu_init(void)
 	assert(!identity_map((u32)CONFIG_SYS_TEXT_BASE - header_mem_reserved,
 			CONFIG_UBOOT_EARLY_MEM + header_mem_reserved,
 			C0_ENTRYLO_WB));
-}
-
-u32 sb(void)
-{
-	soc_mmu_init();
 	spl_lowlevel_init();
-#if defined(CONFIG_DRAM_DDR2)
-	init_ddr2();
-#elif defined(CONFIG_DRAM_DDR3)
-	init_ddr3();
-#endif
+	init_ddr();
 	board_init_r(NULL, 0);
-	spl_end();
-	return 0;
+	hang();
 }
+#endif
