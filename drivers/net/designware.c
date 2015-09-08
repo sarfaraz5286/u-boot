@@ -569,7 +569,8 @@ static int designware_eth_probe(struct udevice *dev)
 	struct dw_eth_dev *priv = dev_get_priv(dev);
 	int ret;
 
-	debug("%s, iobase=%lx, priv=%p\n", __func__, pdata->iobase, priv);
+	debug("%s, iobase=%lx, priv=%p\n", __func__,
+			(unsigned long int)pdata->iobase, priv);
 	priv->mac_regs_p = (struct eth_mac_regs *)pdata->iobase;
 	priv->dma_regs_p = (struct eth_dma_regs *)(pdata->iobase +
 			DW_DMA_BASE_OFFSET);

@@ -73,6 +73,7 @@ struct crc_t {
 	return ret;				\
 }
 
+#ifdef CRC_X25
 static uint16_t crc_x25(uint16_t crc, void *void_buf, size_t size)
 {
 	static const uint16_t crc_table[16] = {
@@ -91,7 +92,9 @@ static uint16_t crc_x25(uint16_t crc, void *void_buf, size_t size)
 
 	return crc;
 }
+#endif
 
+#ifdef CRC_16
 static uint16_t crc_16(uint16_t crc, void *void_buf, size_t size)
 {
 	/*
@@ -142,6 +145,7 @@ static uint16_t crc_16(uint16_t crc, void *void_buf, size_t size)
 	return crc;
 
 }
+#endif
 
 static const struct crc_t crc_type = {
 #if defined(CRC_16)
@@ -270,7 +274,7 @@ static int verify_file(FILE *f)
 
 	if ((file_header.data_size + sizeof(struct bimg_header)) >
 	    buf.st_size) {
-		fprintf(stderr, "Data size too big: %d > %d\n",
+		fprintf(stderr, "Data size too big: %d > %ld\n",
 			file_header.data_size, buf.st_size);
 		return -1;
 	}
