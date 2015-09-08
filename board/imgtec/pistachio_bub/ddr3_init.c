@@ -16,7 +16,7 @@
  * Configuration for the Winbond W631GG6KB part using
  * Synopsys DDR uMCTL and DDR Phy
  */
-int init_ddr3(void)
+int init_ddr(void)
 {
 	uint32_t temp_rw_val;
 

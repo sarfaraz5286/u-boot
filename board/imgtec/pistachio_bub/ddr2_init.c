@@ -18,7 +18,7 @@
  * Configuration for the Winbond W972GG6JB-25 part using
  * Synopsys DDR uMCTL and DDR Phy
  */
-int init_ddr2(void)
+int init_ddr(void)
 {
 	/*
 	 * Reset the AXI bridge and DDR Controller in case any spurious
