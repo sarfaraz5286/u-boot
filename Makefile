@@ -898,15 +898,10 @@ u-boot.img u-boot.kwb u-boot.pbl: u-boot.bin FORCE
 u-boot-spl.kwb: u-boot.img spl/u-boot-spl.bin FORCE
 	$(call if_changed,mkimage)
 
-DEC_GRAM_SIZE:=$(shell $(PERL) -e 'print hex("$(CONFIG_SYS_GRAM_SIZE)");')
-DEC_FDT_SIZE:=$(shell $(PERL) -e 'print hex("$(CONFIG_FDT_MAX_SIZE)");')
-DEC_SPL_FDT_OFF:=$(shell $(PERL) -e 'print hex("$(CONFIG_SPL_FDT_OFFSET)");')
-u-boot-spl-pistachio.img: spl/u-boot-spl.bin dts/dt.dtb FORCE
-	@dd if=/dev/zero of=$@ bs=$(DEC_GRAM_SIZE) count=1 conv=notrunc
-	@dd if=spl/u-boot-spl.bin of=$@ bs=$(DEC_GRAM_SIZE) count=1 conv=notrunc
-	@dd if=dts/dt.dtb of=$@ ibs=$(DEC_FDT_SIZE) obs=$(DEC_SPL_FDT_OFF) \
-		count=1 seek=1 conv=notrunc
-u-boot-spl-pistachio.bimg: u-boot-spl-pistachio.img FORCE
+u-boot-spl-dtb.bin: spl/u-boot-spl.bin dts/dt.dtb FORCE
+	$(call if_changed,cat)
+
+u-boot-spl-pistachio.bimg: u-boot-spl-dtb.bin FORCE
 	tools/bimgtool $< $@ $(CONFIG_SYS_GRAM_BASE)
 
 MKIMAGEFLAGS_u-boot-dtb.img = $(MKIMAGEFLAGS_u-boot.img)
@@ -1018,7 +1013,6 @@ u-boot-nand.gph: u-boot.bin FORCE
 	@dd if=/dev/zero bs=8 count=1 2>/dev/null >> $@
 
 DEC_UBOOT_OFF:=$(shell $(PERL) -e 'print hex("$(CONFIG_SYS_SPI_U_BOOT_OFFS)");')
-
 # 1MB of the flash reserved for SPL and 1MB for u-boot payload
 u-boot-pistachio-nor.img: u-boot-dtb.img u-boot-spl-pistachio.bimg FORCE
 	@dd if=/dev/zero of=$@ bs=2M count=1 conv=notrunc
