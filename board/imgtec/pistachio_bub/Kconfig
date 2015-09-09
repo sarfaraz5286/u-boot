@@ -23,3 +23,16 @@ config SYS_CONFIG_NAME
 	default "pistachio_marduk"
 
 endif
+
+if TARGET_PISTACHIO_BEETLE
+
+config SYS_BOARD
+	default "pistachio_bub"
+
+config SYS_VENDOR
+	default "imgtec"
+
+config SYS_CONFIG_NAME
+	default "pistachio_beetle"
+
+endif
