@@ -66,6 +66,10 @@ void spl_lowlevel_init(void) {
 	eth_clk_setup(0, 6);
 	rom_clk_setup(1);
 	usb_clk_setup(6, 2, 7);
+#if defined(CONFIG_TARGET_PISTACHIO_MARDUK) || \
+	defined(CONFIG_TARGET_PISTACHIO_BEETLE)
+	mfio_setup_usb_pwr();
+#endif
 }
 
 void board_init_f(ulong bootflag)
