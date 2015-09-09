@@ -280,3 +280,23 @@ void mfio_setup_uart1(void)
 	pistachio_deselectgpio_selectmfio(59, 0);
 	pistachio_deselectgpio_selectmfio(60, 0);
 }
+
+#if defined(CONFIG_TARGET_PISTACHIO_MARDUK) || \
+	defined(CONFIG_TARGET_PISTACHIO_BEETLE)
+#define USBPHYCONTROL0_ADDR		0x18149000
+#define USBPHYCONTROL0_USB_OTG_DRVVBUS	11
+void mfio_setup_usb_pwr(void)
+{
+	u32 val;
+
+	pistachio_deselectgpio_selectmfio(86, 0);
+	/*
+	 * Allow USB block to control the VBUS on USB_PWR_ON(MFIO 86);
+	 * this will override rpu_l_pll.
+	 *
+	 */
+	val = __raw_readl(USBPHYCONTROL0_ADDR);
+	val |= 1 << USBPHYCONTROL0_USB_OTG_DRVVBUS;
+	__raw_writel(val, USBPHYCONTROL0_ADDR);
+}
+#endif

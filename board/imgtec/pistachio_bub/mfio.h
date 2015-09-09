@@ -180,3 +180,7 @@ void mfio_setup_mmc(void);
 void mfio_setup_ethernet(void);
 void mfio_setup_spim1(void);
 void mfio_setup_uart1(void);
+#if defined(CONFIG_TARGET_PISTACHIO_MARDUK) || \
+	defined(CONFIG_TARGET_PISTACHIO_BEETLE)
+void mfio_setup_usb_pwr(void);
+#endif
