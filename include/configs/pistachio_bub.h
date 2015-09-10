@@ -209,6 +209,7 @@
 #define CONFIG_ENV_SIZE                 0x20000
 
 #define USB_BOOTCOMMAND							\
+	"setenv bootargs $console $earlycon $usbroot $bootextra;" 	\
 	"setenv verify n;"						\
 	"usb start;"							\
 	"ext4load usb $usbdev $fdtaddr $bootdir$fdtfile;"		\
@@ -221,6 +222,7 @@
 	"bootm $loadaddr - $fdtaddr;"
 
 #define MMC_BOOTCOMMAND							\
+	"setenv bootargs $console $earlycon $mmcroot $bootextra;" 	\
 	"setenv verify n;"						\
 	"mmcinfo; mmc dev $mmcdev;"					\
 	"ext4load mmc $mmcdev $fdtaddr $bootdir$fdtfile;"		\
@@ -228,12 +230,13 @@
 	"bootm $loadaddr - $fdtaddr;"
 
 #define NAND_BOOTCOMMAND						\
+	"setenv bootargs $console $earlycon $nandroot ro;" 		\
 	"setenv verify n;"						\
-        "mtdparts default;"						\
+	"mtdparts default;"						\
 	"ubi part rootfs;"						\
 	"ubifsmount ubi:rootfs;"					\
-        "ubifsload $loadaddr $botdir$bootfile;"				\
-	"ubifsload $fdtaddr $bootdir$nandfdtfile;"			\
+	"ubifsload $loadaddr $bootdir$bootfile;"			\
+	"ubifsload $fdtaddr $bootdir$fdtfile;"				\
 	"bootm $loadaddr - $fdtaddr;"
 
 #ifndef NAND_BOOT
@@ -247,9 +250,14 @@
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
+	"console=console=ttyS1,115200n8\0" 				\
+	"earlycon=earlycon=uart8250,mmio32,0x18101500,115200\0" 	\
+	"bootextra=rootwait ro\0"					\
+	"usbroot=root=/dev/sda1\0"					\
+	"mmcroot=root=/dev/mmcblk0p1\0"					\
+	"nandroot=ubi.mtd=1 root=ubi0:rootfs rootfstype=ubifs\0"	\
 	"fdtaddr=0x0D000000\0"						\
-	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"			\
-	"nandfdtfile="PISTACHIO_BOARD_NAME"_nand.dtb\0"			\
+	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\
 	"bootfile=uImage.bin\0"						\
 	"loadaddr=0x0E000000\0"						\
 	"bootdir=/\0"							\
