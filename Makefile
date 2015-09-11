@@ -768,6 +768,20 @@ endif
 endif
 endif
 
+ifeq ($(CONFIG_MIPS),y)
+ifeq ($(CONFIG_SPL),y)
+ifeq ($(CONFIG_TARGET_PISTACHIO_BUB),y)
+ALL-y += u-boot-pistachio-nor.img
+endif
+ifeq ($(CONFIG_TARGET_PISTACHIO_BEETLE),y)
+ALL-y += u-boot-pistachio-nor.img
+endif
+ifeq ($(CONFIG_TARGET_PISTACHIO_MARDUK),y)
+ALL-y += u-boot-pistachio-nor.img
+endif
+endif
+endif
+
 # Add optional build target if defined in board/cpu/soc headers
 ifneq ($(CONFIG_BUILD_TARGET),)
 ALL-y += $(CONFIG_BUILD_TARGET:"%"=%)
