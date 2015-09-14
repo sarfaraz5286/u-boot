@@ -21,7 +21,7 @@ SECTIONS
 	.text : {
 		__text_start = .;
 		*(.text*)
-		. = ALIGN(4096);
+		. = ALIGN(8192);
 		__text_end = .;
 	}
 
