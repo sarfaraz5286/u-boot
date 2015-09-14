@@ -454,6 +454,10 @@ static int reserve_uboot(void)
 	 */
 	gd->relocaddr -= gd->mon_len;
 	gd->relocaddr &= ~(4096 - 1);
+#ifdef CONFIG_MIPS
+	/* Round down to next 8KB limit necessary for MMU mapping*/
+	gd->relocaddr &= ~(8192 - 1);
+#endif
 #ifdef CONFIG_E500
 	/* round down to next 64 kB limit so that IVPR stays aligned */
 	gd->relocaddr &= ~(65536 - 1);
