@@ -70,6 +70,10 @@ void spl_lowlevel_init(void) {
 	defined(CONFIG_TARGET_PISTACHIO_BEETLE)
 	mfio_setup_usb_pwr();
 #endif
+#if defined(CONFIG_TPM) && defined(CONFIG_TPM_TIS_I2C_BUS_NUMBER)
+	i2c_clk_setup(3, 2, CONFIG_TPM_TIS_I2C_BUS_NUMBER);
+	mfio_setup_i2c(CONFIG_TPM_TIS_I2C_BUS_NUMBER);
+#endif
 }
 
 void board_init_f(ulong bootflag)
