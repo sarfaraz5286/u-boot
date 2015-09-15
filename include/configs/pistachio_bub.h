@@ -182,6 +182,11 @@
 #define MTDPARTS_DEFAULT                "mtdparts=spi-nand:-(rootfs)"
 #endif
 
+/* I2C */
+#define CONFIG_IMGTEC_I2C
+#define CONFIG_DM_I2C
+#define CONFIG_CMD_I2C
+
 /* TPM I2C interface */
 #define CONFIG_TPM
 #define CONFIG_TPM_TIS_I2C_BUS_NUMBER		0
