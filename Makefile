@@ -779,6 +779,9 @@ endif
 ifeq ($(CONFIG_TARGET_PISTACHIO_MARDUK),y)
 ALL-y += u-boot-pistachio-nor.img
 endif
+ifeq ($(CONFIG_TARGET_PISTACHIO_CONCERTO),y)
+ALL-y += u-boot-pistachio-nor.img
+endif
 endif
 endif
 
