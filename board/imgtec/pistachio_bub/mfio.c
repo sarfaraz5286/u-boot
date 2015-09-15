@@ -281,6 +281,14 @@ void mfio_setup_uart1(void)
 	pistachio_deselectgpio_selectmfio(60, 0);
 }
 
+#define I2C_DATA_MFIO(i)                (28 + (2*(i)))
+#define I2C_CLK_MFIO(i)                 (29 + (2*(i)))
+void mfio_setup_i2c(u8 interface)
+{
+	pistachio_deselectgpio_selectmfio(I2C_DATA_MFIO(interface), 0);
+	pistachio_deselectgpio_selectmfio(I2C_CLK_MFIO(interface), 0);
+}
+
 #if defined(CONFIG_TARGET_PISTACHIO_MARDUK) || \
 	defined(CONFIG_TARGET_PISTACHIO_BEETLE)
 #define USBPHYCONTROL0_ADDR		0x18149000
