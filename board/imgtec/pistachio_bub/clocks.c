@@ -103,9 +103,9 @@
 #define UART1CLKOUT_MASK		0x000003FF
 
 /* Definitions for I2C setup */
-#define I2CCLKDIV1_CTRL_ADDR(i)		(0x18144000 + 0x013C + (2*(i)*4))
+#define I2CCLKDIV1_CTRL_ADDR(i)		(0x18144800 + 0x013C + (2*(i)*4))
 #define I2CCLKDIV1_MASK			0x0000007F
-#define I2CCLKOUT_CTRL_ADDR(i)		(0x18144000 + 0x0140 + (2*(i)*4))
+#define I2CCLKOUT_CTRL_ADDR(i)		(0x18144800 + 0x0140 + (2*(i)*4))
 #define I2CCLKOUT_MASK			0x0000007F
 
 /* Definitions for ROM clock setup */
