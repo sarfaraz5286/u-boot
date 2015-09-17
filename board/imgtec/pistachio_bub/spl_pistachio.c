@@ -25,6 +25,10 @@ u32 spl_boot_device(void)
 void spl_board_init(void)
 {
 	preloader_console_init();
+	if (init_ddr()) {
+		printf("%s: Error initializing DDR.\n", __func__);
+		hang();
+	}
 	spl_image.flags = 0;
 }
 
@@ -98,7 +102,6 @@ void board_init_f(ulong bootflag)
 			CONFIG_UBOOT_EARLY_MEM + header_mem_reserved,
 			C0_ENTRYLO_WB));
 	spl_lowlevel_init();
-	init_ddr();
 	board_init_r(NULL, 0);
 	hang();
 }
