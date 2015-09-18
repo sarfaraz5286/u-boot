@@ -178,7 +178,8 @@ static int img_hash_xmit(u64 len, u64 addr)
 	}
 	/* and then write the remaining bytes */
 	for (readcount = 0; readcount < remainder; readcount++) {
-		*(bufp + readcount) = __raw_readb(addr + readcount + offset);
+		*(bufp + readcount) = __raw_readb((u32)(addr +
+						readcount + offset));
 		debug("in buffer : %u\n", buf);
 		debug("readcount : %d, addr: %d, offset: %d\n",
 		      (int)readcount, (int)addr, (int)offset);

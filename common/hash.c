@@ -116,6 +116,8 @@ static int hash_finish_crc32(struct hash_algo *algo, void *ctx, void *dest_buf,
 	return 0;
 }
 
+#ifdef CONFIG_DEV_IMGTEC_HASH
+
 /*
  * Hardware hashing solutions do not use the init, update and finish functions
  * Therefore the following three dummy functions are created
@@ -139,6 +141,7 @@ static int hw_dummy_finish(struct hash_algo *algo, void *ctx, void *dest_buf,
 	debug("Warning, function hw_dummy_finish is not supported\n");
 	return 0;
 }
+#endif
 
 /*
  * These are the hash algorithms we support. Chips which support accelerated
