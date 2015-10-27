@@ -249,6 +249,12 @@
 	"ubifsload $fdtaddr $bootdir$fdtfile;"				\
 	"bootm $loadaddr - $fdtaddr;"
 
+#define NET_BOOTCOMMAND										\
+	"sf probe 1:0;"                                                 \
+	"mtdparts default;"                                             \
+	"setenv bootargs $console $earlycon $netroot nfsroot=$serverip:$rootpath $bootextra $mtdparts;"	\
+	ETH_BOOTCOMMAND
+
 /*
  * Update stress test procedure
  * This should only be used with the automatic stress test process from Jenkins
@@ -294,9 +300,11 @@
 	"console=console=ttyS1,115200n8\0" 				\
 	"earlycon=earlycon=uart8250,mmio32,0x18101500,115200\0" 	\
 	"bootextra="BOOT_EXTRA"\0"					\
+	"rootpath=/srv/fs\0"						\
 	"usbroot=root=/dev/sda1\0"					\
 	"mmcroot=root=/dev/mmcblk0p1\0"					\
 	"nandroot=ubi.mtd=1 root=ubi0:rootfs rootfstype=ubifs\0"	\
+	"netroot=root=/dev/nfs rootfstype=nfs ip=dhcp\0"		\
 	"fdtaddr=0x0D000000\0"						\
 	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\
 	"bootfile=uImage.bin\0"						\
@@ -309,6 +317,7 @@
 	"mmcboot="MMC_BOOTCOMMAND"\0"					\
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
 	"ethboot="ETH_BOOTCOMMAND"\0"					\
+	"netboot="NET_BOOTCOMMAND"\0"					\
 	"u_memload=0x00800000\0"					\
 	"u_memsize=0x08000000\0"					\
 	"u_ethaddr=62:5f:8c:ec:6a:ce\0"					\
