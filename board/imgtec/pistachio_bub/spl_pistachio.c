@@ -58,6 +58,14 @@ void spl_lowlevel_init(void) {
 	if (ret != CLOCKS_OK)
 		return;
 
+	/* Move peripheral clock control
+	 * from RPU to MIPS, RPU gate register is not managed
+	 * in Linux so disable its default values
+	 * and assign MIPS gate reg the default values
+	 * *Note*: All unused clocks will be gated by Linux
+	 */
+	setup_clk_gate_defaults();
+
 	/* Setup SPIM1 MFIOs */
 	mfio_setup_spim1();
 
