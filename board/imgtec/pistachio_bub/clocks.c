@@ -69,6 +69,12 @@
 #define MIPSCLKOUT_CTRL_ADDR		0x18144208
 #define MIPSCLKOUT_MASK			0x000000FF
 
+/* Peripheral Clock gate reg */
+#define MIPS_CLOCK_GATE			0x18144900
+#define RPU_CLOCK_GATE			0x18144904
+#define MIPS_CLOCK_GATE_ALL_ON		0x3fff
+#define RPU_CLOCK_GATE_ALL_OFF		0x0
+
 /* Definitions for AUXADC clock setup */
 #define MIPSCLKGATE_ADDR		0x18144104
 #define AUXADC_CLK_INTERNAL_BYPASS_MASK	0x00400000
@@ -439,6 +445,12 @@ int usb_clk_setup(u8 divider, u8 refclksel, u8 fsel)
 	}
 
 	return CLOCKS_OK;
+}
+
+void setup_clk_gate_defaults(void)
+{
+	writel(MIPS_CLOCK_GATE_ALL_ON, MIPS_CLOCK_GATE);
+	writel(RPU_CLOCK_GATE_ALL_OFF, RPU_CLOCK_GATE);
 }
 
 void rom_clk_setup(u8 divider)
