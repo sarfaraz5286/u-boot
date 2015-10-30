@@ -54,7 +54,7 @@ void spl_lowlevel_init(void) {
 		return;
 
 	/* Setup MIPS PLL at 546 MHz */
-	ret = mips_pll_setup(2, 1, 1, 21);
+	ret = mips_pll_setup(2, 1, 5, 105);
 	if (ret != CLOCKS_OK)
 		return;
 
