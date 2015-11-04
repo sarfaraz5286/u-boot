@@ -182,8 +182,8 @@
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_CMD_UBI
 #define CONFIG_CMD_UBIFS
-#define MTDIDS_DEFAULT                  "nand0=SPI_NAND_512MiB_3_3V,nor0=spi32766.0"
-#define MTDPARTS_DEFAULT                "mtdparts=SPI_NAND_512MiB_3_3V:-(rootfs);spi32766.0:2036k(uboot),4k(data),8k(env)"
+#define MTDIDS_DEFAULT                  "nand0=spi-nand,nor0=spi-nor"
+#define MTDPARTS_DEFAULT                "mtdparts=spi-nand:-(rootfs);spi-nor:2036k(uboot),4k(data),8k(env)"
 #endif
 
 /* I2C */
