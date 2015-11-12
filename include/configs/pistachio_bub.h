@@ -183,7 +183,8 @@
 #define CONFIG_CMD_UBI
 #define CONFIG_CMD_UBIFS
 #define MTDIDS_DEFAULT                  "nand0=spi-nand,nor0=spi-nor"
-#define MTDPARTS_DEFAULT                "mtdparts=spi-nand:-(rootfs);spi-nor:2036k(uboot),4k(data),8k(env)"
+#define MTDPARTS_DEFAULT		"mtdparts=spi-nand:256M(firmware0),256M(firmware1);"\
+					"spi-nor:1536k(uboot),8k(data-ro),8k(uEnv),496k(data-rw)"
 #endif
 
 /* I2C */
@@ -219,7 +220,7 @@
 #define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SECT_SIZE		0x01000		/* 4KB */
 #define CONFIG_ENV_SIZE			0x02000		/* 8KB */
-#define CONFIG_ENV_OFFSET		0x1fe000	/* env starts here */
+#define CONFIG_ENV_OFFSET		0x182000	/* env starts here */
 #define CONFIG_ENV_SPI_BUS		1
 #define CONFIG_ENV_SPI_CS		0
 
@@ -253,7 +254,7 @@
 	"mtdparts default;"                                             \
 	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;" 	\
 	"setenv verify n;"						\
-	"ubi part rootfs;"						\
+	"ubi part firmware0;"						\
 	"ubifsmount ubi:rootfs;"					\
 	"ubifsload $loadaddr $bootdir$bootfile;"			\
 	"ubifsload $fdtaddr $bootdir$fdtfile;"				\
@@ -297,7 +298,7 @@
 	"rootpath=/srv/fs\0"						\
 	"usbroot=root=/dev/sda1\0"					\
 	"mmcroot=root=/dev/mmcblk0p1\0"					\
-	"nandroot=ubi.mtd=3 root=ubi0:rootfs rootfstype=ubifs\0"	\
+	"nandroot=ubi.mtd=4 root=ubi0:rootfs rootfstype=ubifs\0"	\
 	"netroot=root=/dev/nfs rootfstype=nfs ip=dhcp\0"		\
 	"fdtaddr=0x0D000000\0"						\
 	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\

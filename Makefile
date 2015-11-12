@@ -1030,11 +1030,11 @@ u-boot-nand.gph: u-boot.bin FORCE
 	@dd if=/dev/zero bs=8 count=1 2>/dev/null >> $@
 
 DEC_UBOOT_OFF:=$(shell $(PERL) -e 'print hex("$(CONFIG_SYS_SPI_U_BOOT_OFFS)");')
-# 512KB of the flash reserved for SPL and 1.48MB for u-boot payload
+# 512KB of the flash reserved for SPL and 1MB for u-boot payload
 u-boot-pistachio-nor.img: u-boot-dtb.img u-boot-spl-pistachio.bimg FORCE
-	@dd if=/dev/zero of=$@ bs=4K count=509 conv=notrunc
+	@dd if=/dev/zero of=$@ bs=4K count=384 conv=notrunc
 	@dd if=u-boot-spl-pistachio.bimg of=$@ bs=4K count=128 conv=notrunc
-	@dd if=u-boot-dtb.img of=$@ bs=4K count=381 seek=128 conv=notrunc
+	@dd if=u-boot-dtb.img of=$@ bs=4K count=256 seek=128 conv=notrunc
 
 # x86 uses a large ROM. We fill it with 0xff, put the 16-bit stuff (including
 # reset vector) at the top, Intel ME descriptor at the bottom, and U-Boot in
