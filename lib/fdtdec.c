@@ -76,6 +76,8 @@ static const char * const compat_names[COMPAT_COUNT] = {
 	COMPAT(SOCIONEXT_XHCI, "socionext,uniphier-xhci"),
 	COMPAT(COMPAT_INTEL_PCH, "intel,bd82x6x"),
 	COMPAT(COMPAT_INTEL_IRQ_ROUTER, "intel,irq-router"),
+	COMPAT(GIGADEVICE_NAND_GD5F, "gigadevice,gd5f"),
+	COMPAT(MICRON_NAND_MT29, "micron,mt29")
 };
 
 const char *fdtdec_get_compatible(enum fdt_compat_id id)

@@ -11,6 +11,7 @@
 
 #include <common.h>
 #include <errno.h>
+#include <fdtdec.h>
 #include <linux/compat.h>
 #include <linux/err.h>
 #include <linux/mtd/mtd.h>
@@ -24,6 +25,8 @@
 /* Necessary for NAND command */
 extern nand_info_t nand_info[];
 #endif
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /* SPI NAND commands */
 #define	SPI_NAND_WRITE_ENABLE		0x06
@@ -147,6 +150,12 @@ enum spi_nand_device_variant {
 	SPI_NAND_GD5F,
 };
 
+/* Information about an attached NAND chip */
+struct fdt_nand {
+	u8 op_mode_rx; /* RX bus width */
+	u8 op_mode_tx; /* TX bus width */
+};
+
 struct spi_nand_device_cmd {
 	/*
 	 * Command and address. I/O errors have been observed if a
@@ -154,7 +163,7 @@ struct spi_nand_device_cmd {
 	 * so keep them together.
 	 */
 	u32 n_cmd;
-	u8 cmd[4];
+	u8 cmd[5];
 
 	/* Tx data */
 	u32 n_tx;
@@ -169,6 +178,7 @@ struct spi_nand_device {
 	struct spi_nand	spi_nand;
 	struct spi_slave *spi;
 	struct spi_nand_device_cmd cmd;
+	struct fdt_nand config;
 };
 
 static int spi_nand_send_command(struct spi_slave *spi,
@@ -315,10 +325,15 @@ static int spi_nand_device_store_cache(struct spi_nand *snand,
 {
 	struct spi_nand_device *snand_dev = snand->priv;
 	struct spi_nand_device_cmd *cmd = &snand_dev->cmd;
+	struct fdt_nand *config = &snand_dev->config;
+	int ret;
 
 	memset(cmd, 0, sizeof(struct spi_nand_device_cmd));
 	cmd->n_cmd = 3;
-	cmd->cmd[0] = SPI_NAND_PROGRAM_LOAD;
+	if (config->op_mode_tx & SPI_OPM_TX_QPP)
+		cmd->cmd[0] = SPI_NAND_PROGRAM_LOAD4;
+	else
+		cmd->cmd[0] = SPI_NAND_PROGRAM_LOAD;
 	cmd->cmd[1] = (u8)((page_offset & 0xff00) >> 8);
 	cmd->cmd[2] = (u8)(page_offset & 0xff);
 	cmd->n_tx = length;
@@ -326,7 +341,11 @@ static int spi_nand_device_store_cache(struct spi_nand *snand,
 
 	dev_dbg(snand->dev, "%s: offset 0x%x\n", __func__, page_offset);
 
-	return spi_nand_send_command(snand_dev->spi, cmd);
+	snand_dev->spi->op_mode_tx = config->op_mode_tx;
+	ret = spi_nand_send_command(snand_dev->spi, cmd);
+	snand_dev->spi->op_mode_tx = 0;
+
+	return ret;
 }
 
 static int spi_nand_device_load_page(struct spi_nand *snand,
@@ -353,19 +372,36 @@ static int spi_nand_device_read_cache(struct spi_nand *snand,
 {
 	struct spi_nand_device *snand_dev = snand->priv;
 	struct spi_nand_device_cmd *cmd = &snand_dev->cmd;
+	struct fdt_nand *config = &snand_dev->config;
+	int ret;
 
 	memset(cmd, 0, sizeof(struct spi_nand_device_cmd));
-	cmd->n_cmd = 4;
-	cmd->cmd[0] = SPI_NAND_READ_CACHE;
+	if ((config->op_mode_rx & SPI_OPM_RX_DOUT) ||
+		(config->op_mode_rx & SPI_OPM_RX_QOF))
+		cmd->n_cmd = 5;
+	else
+		cmd->n_cmd = 4;
+
+	cmd->cmd[0] = (config->op_mode_rx & SPI_OPM_RX_QOF) ?
+			SPI_NAND_READ_CACHE_X4 :
+			((config->op_mode_rx & SPI_OPM_RX_DOUT) ?
+			SPI_NAND_READ_CACHE_X2 :
+			SPI_NAND_READ_CACHE);
+
 	cmd->cmd[1] = 0; /* dummy byte */
 	cmd->cmd[2] = (u8)((page_offset & 0xff00) >> 8);
 	cmd->cmd[3] = (u8)(page_offset & 0xff);
+	cmd->cmd[4] = 0; /* dummy byte */
 	cmd->n_rx = length;
 	cmd->rx_buf = read_buf;
 
 	dev_dbg(snand->dev, "%s: offset 0x%x\n", __func__, page_offset);
 
-	return spi_nand_send_command(snand_dev->spi, cmd);
+	snand_dev->spi->op_mode_rx = config->op_mode_rx;
+	ret = spi_nand_send_command(snand_dev->spi, cmd);
+	snand_dev->spi->op_mode_rx = 0;
+
+	return ret;
 }
 
 static int spi_nand_device_block_erase(struct spi_nand *snand,
@@ -448,11 +484,30 @@ static void spi_nand_gd5f_ecc_status(unsigned int status,
 }
 #endif
 
+static int fdt_decode_nand(const void *blob, int node, struct fdt_nand *config)
+{
+	int ret;
+
+	ret = fdtdec_get_int(gd->fdt_blob, node, "spi-rx-bus-width", 0);
+	config->op_mode_rx = 0;
+	if (ret == 4) /* Quad mode */
+		config->op_mode_rx = SPI_OPM_RX_QOF;
+	else if (ret == 2) /* Dual mode */
+		config->op_mode_rx = SPI_OPM_RX_DOUT;
+
+	ret = fdtdec_get_int(gd->fdt_blob, node, "spi-tx-bus-width", 0);
+	config->op_mode_tx = 0;
+	if (ret == 4) /* Quad mode */
+		config->op_mode_tx = SPI_OPM_TX_QPP;
+	return 0;
+}
+
 void board_nand_init(void)
 {
 	struct spi_nand_device *priv;
 	struct spi_nand *snand;
-	int ret;
+	struct fdt_nand *config;
+	int ret, node;
 	char *name = "spi-nand";
 
 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
@@ -462,6 +517,7 @@ void board_nand_init(void)
 	}
 
 	snand = &priv->spi_nand;
+	config = &priv->config;
 
 	snand->read_cache = spi_nand_device_read_cache;
 	snand->load_page = spi_nand_device_load_page;
@@ -507,15 +563,27 @@ void board_nand_init(void)
 #ifdef CONFIG_SPI_NAND_MT29F
 		snand->read_id = spi_nand_mt29f_read_id;
 		snand->get_ecc_status = spi_nand_mt29f_ecc_status;
+		node = fdtdec_next_compatible(gd->fdt_blob, 0,
+				COMPAT_MICRON_NAND_MT29);
 #else
 #ifdef CONFIG_SPI_NAND_GD5F
 		snand->read_id = spi_nand_gd5f_read_id;
 		snand->get_ecc_status = spi_nand_gd5f_ecc_status;
+		node = fdtdec_next_compatible(gd->fdt_blob, 0,
+				COMPAT_GIGADEVICE_NAND_GD5F);
 #else
 		dev_err(snand->dev, "unknown device\n");
 		return;
 #endif /* CONFIG_SPI_NAND_GD5F */
 #endif  /* CONFIG_SPI_NAND_MT29F */
+
+	if (node < 0) {
+		dev_err(snand->dev, "No compatible node found in device tree.\n");
+		return;
+	} else if (fdt_decode_nand(gd->fdt_blob, node, config)) {
+		dev_err(snand->dev, "Error parsing device-tree node.\n");
+		return;
+	}
 
 	/*
 	 * Initialize spi_slave

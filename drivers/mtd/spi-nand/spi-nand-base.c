@@ -30,6 +30,7 @@
 
 #define SPI_NAND_FEATURE_REG		0xb0
 #define SPI_NAND_ECC_EN			BIT(4)
+#define SPI_NAND_QUAD_EN		BIT(0)
 
 #define SPI_NAND_STATUS_REG		0xc0
 #define SPI_NAND_STATUS_REG_ECC_MASK	0x3
@@ -78,6 +79,22 @@ static int spi_nand_disable_ecc(struct spi_nand *snand)
 	if (ret)
 		return ret;
 	snand->ecc = false;
+
+	return 0;
+}
+
+static int spi_nand_enable_quad(struct spi_nand *snand)
+{
+	int ret;
+
+	ret = snand->read_reg(snand, SPI_NAND_FEATURE_REG, snand->buf);
+	if (ret)
+		return ret;
+
+	snand->buf[0] |= SPI_NAND_QUAD_EN;
+	ret = snand->write_reg(snand, SPI_NAND_FEATURE_REG, snand->buf);
+	if (ret)
+		return ret;
 
 	return 0;
 }
@@ -189,6 +206,12 @@ static int spi_nand_write(struct spi_nand *snand)
 {
 	int ret;
 
+	/* Enable quad mode */
+	ret = spi_nand_enable_quad(snand);
+	if (ret) {
+		dev_err(snand->dev, "error %d enabling quad mode\n", ret);
+		return ret;
+	}
 	/* Store the page to cache */
 	ret = snand->store_cache(snand, 0, snand->buf_size, snand->data_buf);
 	if (ret < 0) {
@@ -261,6 +284,13 @@ static int spi_nand_read_page(struct spi_nand *snand, unsigned int page_addr,
 		} else {
 			snand->mtd->ecc_stats.corrected += corrected;
 		}
+	}
+
+	/* Enable quad mode */
+	ret = spi_nand_enable_quad(snand);
+	if (ret) {
+		dev_err(snand->dev, "error %d enabling quad mode\n", ret);
+		return ret;
 	}
 
 	/* Get page from the device cache into our internal buffer */
