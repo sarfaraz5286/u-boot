@@ -197,7 +197,9 @@ static int spi_nand_send_command(struct spi_slave *spi,
 	spi_claim_bus(spi);
 
 	/* Command and address */
-	if (spi_xfer(spi, cmd->n_cmd * 8, cmd->cmd, NULL, SPI_XFER_BEGIN)) {
+	if (spi_xfer(spi, cmd->n_cmd * 8, cmd->cmd, NULL,
+		(cmd->n_tx || cmd->n_rx) ? SPI_XFER_BEGIN :
+		SPI_XFER_BEGIN | SPI_XFER_END)) {
 		dev_err(&spi->dev, "Failed to send command.\n");
 		return -1;
 	}
