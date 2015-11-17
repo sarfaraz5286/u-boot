@@ -73,6 +73,10 @@ struct imgtec_spi_slave {
 	u32 base;
 	/* Boolean property that is TRUE if API has been initialised */
 	int initialised;
+	/* Value that is set if the transaction should be finalized */
+	int complete;
+	/* Flags passed with transfer info */
+	u32 flags;
 	/* GPIO correspondence for CS line */
 	unsigned int gpio;
 };

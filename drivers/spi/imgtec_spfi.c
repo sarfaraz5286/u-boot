@@ -237,6 +237,8 @@ static inline void gpio_direction_output(unsigned int pin)
 #define SPIM_MAX_BLOCK_BYTES			(0x40)
 /* Microseconds until timeout is returned */
 #define SPI_TIMEOUT_VALUE_MS			500
+/* Maximum bytes pending */
+#define SPFI_DATA_REQUEST_MAX_SIZE		8
 
 /* This type defines the SPIM device numbers (chip select lines). */
 enum spim_device {
@@ -404,6 +406,108 @@ static int check_device_params(struct spim_device_parameters *pdev_param)
 	return SPIM_OK;
 }
 
+static void spfi_switch(struct spi_slave *slave, int on)
+{
+	struct imgtec_spi_slave *bus = to_imgtec_spi_slave(slave);
+	uint32_t reg;
+
+	if (on && !(bus->complete))
+		return;
+	reg = readl(bus->base + SPFI_CONTROL_REG_OFFSET);
+	reg = spi_write_reg_field(reg, SPFI_EN, !!on);
+	writel(reg, bus->base + SPFI_CONTROL_REG_OFFSET);
+}
+
+static int spfi_wait_all_done(struct spi_slave *slave)
+{
+	struct imgtec_spi_slave *bus = to_imgtec_spi_slave(slave);
+	unsigned long deadline = get_timer(0) + SPI_TIMEOUT_VALUE_MS;
+
+	do {
+		if (get_timer(0) > deadline)
+			return -SPIM_TIMEOUT_ERROR;
+	} while (!(readl(bus->base + SPFI_INT_STATUS_REG_OFFSET) &
+			SPFI_ALLDONE_MASK));
+	writel(SPFI_ALLDONE_MASK, bus->base + SPFI_INT_CLEAR_REG_OFFSET);
+
+	return SPIM_OK;
+}
+
+/* tx/rx will be 0 if "bytes" bytes must be transmitted/received */
+static int spim_config(struct spi_slave *slave, unsigned int tx,
+			unsigned int rx, unsigned int bytes)
+{
+	struct imgtec_spi_slave *bus = to_imgtec_spi_slave(slave);
+	uint32_t base, reg;
+	int is_pending, ret;
+
+	base = bus->base;
+
+	/*
+	 * For read or write transfers of less than 8 bytes (cmd = 1 byte,
+	 * addr up to 7 bytes), SPFI will be configured, but not enabled
+	 * (unless it is the last transfer in the queue).The transfer will
+	 * be enabled by the subsequent transfer.
+	 * A pending transfer is determined by the content of the
+	 * transaction register: if command part is set and tsize
+	 * is not.
+	 */
+	reg = readl(base + SPFI_TRANSACTION_REG_OFFSET);
+	is_pending = (reg & SPFI_CMD_LENGTH_MASK) && (!(reg & SPFI_TSIZE_MASK));
+
+	if (!(bus->flags & SPI_XFER_END) && !tx &&
+		(bytes <= SPFI_DATA_REQUEST_MAX_SIZE) && !is_pending) {
+		reg = spi_write_reg_field(0, SPFI_CMD_LENGTH, 1);
+		reg = spi_write_reg_field(reg, SPFI_ADDR_LENGTH, bytes - 1);
+		bus->complete = 0;
+	} else {
+		bus->complete = 1;
+		if (is_pending) {
+			if (!tx) {
+				/* Finish pending transfer first for transmit */
+				spfi_switch(slave, 1);
+				ret = spfi_wait_all_done(slave);
+				if (ret < 0)
+					return ret;
+				spfi_switch(slave, 0);
+				reg = 0;
+			}
+			/* Keep setup from peding transfer */
+			reg = spi_write_reg_field(reg, SPFI_TSIZE, bytes);
+		} else {
+			reg = spi_write_reg_field(0, SPFI_TSIZE, bytes);
+		}
+	}
+	/* Set transaction register */
+	writel(reg, base + SPFI_TRANSACTION_REG_OFFSET);
+
+	/* Clear status */
+	writel(0xffffffff, base + SPFI_INT_CLEAR_REG_OFFSET);
+
+	/* Set control register */
+	reg = readl(base + SPFI_CONTROL_REG_OFFSET);
+	/* Set send DMA if write transaction exists */
+	reg = spi_write_reg_field(reg, SPIM_SEND_DMA, (!tx || is_pending) ?
+							1 : 0);
+	/* Set get DMA if read transaction exists */
+	reg = spi_write_reg_field(reg, SPIM_GET_DMA, (!rx) ? 1 : 0);
+	/* Same edge used for higher operational frequency */
+	reg = spi_write_reg_field(reg, SPIM_EDGE_TX_RX, 1);
+
+	/* Set transfer mode: single, dual or quad */
+	if ((slave->op_mode_rx & SPI_OPM_RX_QOF) ||
+			(slave->op_mode_tx & SPI_OPM_TX_QPP))
+		reg = spi_write_reg_field(reg, SPFI_TMODE, SPIM_DMODE_QUAD);
+	else if (slave->op_mode_rx & SPI_OPM_RX_DOUT)
+		reg = spi_write_reg_field(reg, SPFI_TMODE, SPIM_DMODE_DUAL);
+	else
+		reg = spi_write_reg_field(reg, SPFI_TMODE, SPIM_DMODE_SINGLE);
+
+	writel(reg, base + SPFI_CONTROL_REG_OFFSET);
+
+	return SPIM_OK;
+}
+
 /* Function that carries out read/write operations */
 static int spim_io(struct spi_slave *slave, void *din,
 		   const void *dout, unsigned int bytes)
@@ -411,8 +515,9 @@ static int spim_io(struct spi_slave *slave, void *din,
 	struct imgtec_spi_slave *bus;
 	unsigned int tx, rx;
 	int both_hf, either_hf, incoming, transferred = 0;
-	uint32_t reg, status = 0, data, base;
+	uint32_t status = 0, data, base;
 	unsigned long deadline = get_timer(0) + SPI_TIMEOUT_VALUE_MS;
+	int ret = SPIM_OK;
 
 	if (!slave) {
 		printf("%s: Error: slave not initialized.\n", __func__);
@@ -421,27 +526,14 @@ static int spim_io(struct spi_slave *slave, void *din,
 	bus = to_imgtec_spi_slave(slave);
 	base = bus->base;
 
-	/* Set transaction register */
-	reg = spi_write_reg_field(0, SPFI_TSIZE, bytes);
-	writel(reg, base + SPFI_TRANSACTION_REG_OFFSET);
-	/* Clear status */
-	writel(0xffffffff, base + SPFI_INT_CLEAR_REG_OFFSET);
-
-	/* Set control register */
-	reg = readl(base + SPFI_CONTROL_REG_OFFSET);
-	/* Enable SPFI */
-	reg |= spi_write_reg_field(reg, SPFI_EN, 1);
-	/* Set send DMA if write transaction exists */
-	reg = spi_write_reg_field(reg, SPIM_SEND_DMA, (dout) ? 1 : 0);
-	/* Set get DMA if read transaction exists */
-	reg = spi_write_reg_field(reg, SPIM_GET_DMA, (din) ? 1 : 0);
-	/* Same edge used for higher operational frequency */
-	reg = spi_write_reg_field(reg, SPIM_EDGE_TX_RX, 1);
-
-	writel(reg, base + SPFI_CONTROL_REG_OFFSET);
-
 	tx = (dout) ? 0 : bytes;
 	rx = (din) ? 0 : bytes;
+	ret = spim_config(slave, tx, rx, bytes);
+	if (ret < 0) {
+		printf("%s: SPIM config failed.\n", __func__);
+		return ret;
+	}
+	spfi_switch(slave, 1);
 
 	/* We send/receive as long as we still have data available */
 	while ((tx < bytes) || (rx < bytes)) {
@@ -513,20 +605,18 @@ static int spim_io(struct spi_slave *slave, void *din,
 			transferred = 1;
 		}
 	}
-
+	/* If we're not supposed to finalize the transaction, just return */
+	if (!(bus->complete))
+		return SPIM_OK;
 	/*
 	 * We wait for ALLDONE trigger to be set, signaling that it's ready
 	 * to accept another transaction
 	 */
-	deadline = get_timer(0) + SPI_TIMEOUT_VALUE_MS;
+	ret = spfi_wait_all_done(slave);
+	/* Disable SPFI for it to not interfere with pending transactions */
+	spfi_switch(slave, 0);
 
-	do {
-		if (get_timer(0) > deadline)
-			return -SPIM_TIMEOUT_ERROR;
-		status = readl(base + SPFI_INT_STATUS_REG_OFFSET);
-	} while (!(status & SPFI_ALLDONE_MASK));
-	writel(SPFI_ALLDONE_MASK, base + SPFI_INT_CLEAR_REG_OFFSET);
-	return SPIM_OK;
+	return ret;
 }
 
 void spi_cs_activate(struct spi_slave *slave)
@@ -611,9 +701,14 @@ int spi_claim_bus(struct spi_slave *slave)
 	/* Set the control register */
 	reg = (bus->device_parameters).inter_byte_delay ?
 			SPIM_BYTE_DELAY_MASK : 0;
-	/* Set up the transfer mode */
-	reg = spi_write_reg_field(reg, SPFI_TRNSFR_MODE_DQ, SPIM_CMD_MODE_0);
-	reg = spi_write_reg_field(reg, SPFI_TRNSFR_MODE, SPIM_DMODE_SINGLE);
+	/*
+	 * Set up the command/addr/dummy mode to be 0
+	 * The upper layers have no knowledge of this mode but they
+	 * will always use X2/X4 operations for dual and quad which are
+	 * consistent with this command mode: cmd/addr/dummy transferred
+	 * on one line, data transferred on all lines
+	 */
+	reg = spi_write_reg_field(reg, SPFI_TMODE_DQ, SPIM_CMD_MODE_0);
 	writel(reg, bus->base + SPFI_CONTROL_REG_OFFSET);
 	bus->initialised = IMG_TRUE;
 
@@ -649,6 +744,15 @@ int  spi_xfer(struct spi_slave *slave, unsigned int bitlen, const void *dout,
 {
 	unsigned int to_transfer, bytes_trans = 0;
 	int bytes, ret = 0;
+	struct imgtec_spi_slave *bus;
+
+	if (!slave) {
+		printf("%s: Error: slave not initialized.\n", __func__);
+		return -SPIM_API_NOT_INITIALISED;
+	}
+	bus = to_imgtec_spi_slave(slave);
+	/* Set flags for current transaction */
+	bus->flags = flags;
 
 	/* SPI core configured to do 8 bit transfers */
 	if (bitlen % 8) {
@@ -680,7 +784,8 @@ int  spi_xfer(struct spi_slave *slave, unsigned int bitlen, const void *dout,
 			      (dout) ? (dout + bytes_trans) : NULL,
 					to_transfer);
 		if (ret) {
-			printf("%s: Error: Transfer failed!\n", __func__);
+			printf("%s: Error: Transfer failed with error %d!\n",
+				__func__, ret);
 			return ret;
 		}
 		bytes_trans += to_transfer;
