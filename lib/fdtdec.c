@@ -77,6 +77,8 @@ static const char * const compat_names[COMPAT_COUNT] = {
 	COMPAT(ALTERA_SOCFPGA_DWMMC, "altr,socfpga-dw-mshc"),
 	COMPAT(COMPAT_INTEL_BAYTRAIL_FSP, "intel,baytrail-fsp"),
 	COMPAT(COMPAT_INTEL_BAYTRAIL_FSP_MDP, "intel,baytrail-fsp-mdp"),
+	COMPAT(GIGADEVICE_NAND_GD5F, "gigadevice,gd5f"),
+	COMPAT(MICRON_NAND_MT29, "micron,mt29")
 };
 
 const char *fdtdec_get_compatible(enum fdt_compat_id id)

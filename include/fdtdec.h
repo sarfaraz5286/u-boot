@@ -173,6 +173,8 @@ enum fdt_compat_id {
 	COMPAT_ALTERA_SOCFPGA_DWMMC,	/* SoCFPGA DWMMC controller */
 	COMPAT_INTEL_BAYTRAIL_FSP,	/* Intel Bay Trail FSP */
 	COMPAT_INTEL_BAYTRAIL_FSP_MDP,	/* Intel FSP memory-down params */
+	COMPAT_GIGADEVICE_NAND_GD5F,	/* Gigadevice GD5F NAND SPI flash */
+	COMPAT_MICRON_NAND_MT29,	/* Micron MT29 NAND SPI flash */
 
 	COMPAT_COUNT,
 };
