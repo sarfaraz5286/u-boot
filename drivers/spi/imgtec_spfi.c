@@ -83,144 +83,144 @@ static inline void gpio_direction_output(unsigned int pin)
  * b7:0		CS_DELAY	Chip Select delay = (40 * value) ns
  */
 
-#define SPIM_CLK_DIVIDE_MASK     (0xFF000000)
-#define SPIM_CS_SETUP_MASK       (0x00FF0000)
-#define SPIM_CS_HOLD_MASK        (0x0000FF00)
-#define SPIM_CS_DELAY_MASK       (0x000000FF)
-#define SPIM_CS_PARAM_MASK      (SPIM_CS_SETUP_MASK \
+#define SPIM_CLK_DIVIDE_MASK	0xFF000000
+#define SPIM_CS_SETUP_MASK	0x00FF0000
+#define SPIM_CS_HOLD_MASK	0x0000FF00
+#define SPIM_CS_DELAY_MASK	0x000000FF
+#define SPIM_CS_PARAM_MASK	(SPIM_CS_SETUP_MASK \
 				| SPIM_CS_HOLD_MASK \
 				| SPIM_CS_DELAY_MASK)
 
-#define SPIM_CLK_DIVIDE_SHIFT            (24)
-#define SPIM_CS_SETUP_SHIFT              (16)
-#define SPIM_CS_HOLD_SHIFT                (8)
-#define SPIM_CS_DELAY_SHIFT               (0)
-#define SPIM_CS_PARAM_SHIFT               (0)
+#define SPIM_CLK_DIVIDE_SHIFT		24
+#define SPIM_CS_SETUP_SHIFT		16
+#define SPIM_CS_HOLD_SHIFT		8
+#define SPIM_CS_DELAY_SHIFT		0
+#define SPIM_CS_PARAM_SHIFT		0
 
 /* Control register */
 
-#define SPFI_DRIBBLE_COUNT_MASK  (0x000e0000)
-#define SPFI_MEMORY_IF_MASK      (0x00008000)
-#define SPIM_BYTE_DELAY_MASK     (0x00004000)
-#define SPIM_CS_DEASSERT_MASK    (0x00002000)
-#define SPIM_CONTINUE_MASK       (0x00001000)
-#define SPIM_SOFT_RESET_MASK     (0x00000800)
-#define SPIM_SEND_DMA_MASK       (0x00000400)
-#define SPIM_GET_DMA_MASK        (0x00000200)
-#define SPIM_EDGE_TX_RX_MASK     (0x00000100)
-#define SPFI_TRNSFR_MODE_MASK    (0x000000e0)
-#define SPFI_TRNSFR_MODE_DQ_MASK (0x0000001c)
-#define SPFI_TX_RX_MASK          (0x00000002)
-#define SPFI_EN_MASK             (0x00000001)
+#define SPFI_DRIBBLE_COUNT_MASK	0x000e0000
+#define SPFI_MEMORY_IF_MASK	0x00008000
+#define SPIM_BYTE_DELAY_MASK	0x00004000
+#define SPIM_CS_DEASSERT_MASK	0x00002000
+#define SPIM_CONTINUE_MASK	0x00001000
+#define SPIM_SOFT_RESET_MASK	0x00000800
+#define SPIM_SEND_DMA_MASK	0x00000400
+#define SPIM_GET_DMA_MASK	0x00000200
+#define SPIM_EDGE_TX_RX_MASK	0x00000100
+#define SPFI_TMODE_MASK		0x000000e0
+#define SPFI_TMODE_DQ_MASK	0x0000001c
+#define SPFI_TX_RX_MASK		0x00000002
+#define SPFI_EN_MASK		0x00000001
 
-#define SPFI_DRIBBLE_COUNT_SHIFT         (17)
-#define SPFI_MEMORY_IF_SHIFT             (15)
-#define SPIM_BYTE_DELAY_SHIFT            (14)
-#define SPIM_CS_DEASSERT_SHIFT           (13)
-#define SPIM_CONTINUE_SHIFT              (12)
-#define SPIM_SOFT_RESET_SHIFT            (11)
-#define SPIM_SEND_DMA_SHIFT              (10)
-#define SPIM_GET_DMA_SHIFT                (9)
-#define SPIM_EDGE_TX_RX_SHIFT             (8)
-#define SPFI_TRNSFR_MODE_SHIFT            (5)
-#define SPFI_TRNSFR_MODE_DQ_SHIFT         (2)
-#define SPFI_TX_RX_SHIFT                  (1)
-#define SPFI_EN_SHIFT                     (0)
+#define SPFI_DRIBBLE_COUNT_SHIFT	17
+#define SPFI_MEMORY_IF_SHIFT		15
+#define SPIM_BYTE_DELAY_SHIFT		14
+#define SPIM_CS_DEASSERT_SHIFT		13
+#define SPIM_CONTINUE_SHIFT		12
+#define SPIM_SOFT_RESET_SHIFT		11
+#define SPIM_SEND_DMA_SHIFT		10
+#define SPIM_GET_DMA_SHIFT		9
+#define SPIM_EDGE_TX_RX_SHIFT		8
+#define SPFI_TMODE_SHIFT		5
+#define SPFI_TMODE_DQ_SHIFT		2
+#define SPFI_TX_RX_SHIFT		1
+#define SPFI_EN_SHIFT			0
 
 /* Transaction register*/
 
-#define SPFI_TSIZE_MASK           (0xffff0000)
-#define SPFI_CMD_LENGTH_MASK      (0x0000e000)
-#define SPFI_ADDR_LENGTH_MASK     (0x00001c00)
-#define SPFI_DUMMY_LENGTH_MASK    (0x000003e0)
-#define SPFI_PI_LENGTH_MASK       (0x0000001c)
+#define SPFI_TSIZE_MASK			0xffff0000
+#define SPFI_CMD_LENGTH_MASK		0x0000e000
+#define SPFI_ADDR_LENGTH_MASK		0x00001c00
+#define SPFI_DUMMY_LENGTH_MASK		0x000003e0
+#define SPFI_PI_LENGTH_MASK		0x0000001c
 
-#define SPFI_TSIZE_SHIFT                  (16)
-#define SPFI_CMD_LENGTH_SHIFT             (13)
-#define SPFI_ADDR_LENGTH_SHIFT            (10)
-#define SPFI_DUMMY_LENGTH_SHIFT            (5)
-#define SPFI_PI_LENGTH_SHIFT               (2)
+#define SPFI_TSIZE_SHIFT		16
+#define SPFI_CMD_LENGTH_SHIFT		13
+#define SPFI_ADDR_LENGTH_SHIFT		10
+#define SPFI_DUMMY_LENGTH_SHIFT		5
+#define SPFI_PI_LENGTH_SHIFT		2
 
 /* Port state register */
 
-#define SPFI_PORT_SELECT_MASK    (0x00700000)
+#define SPFI_PORT_SELECT_MASK		0x00700000
 /* WARNING the following bits are reversed */
-#define SPFI_CLOCK0_IDLE_MASK    (0x000f8000)
-#define SPFI_CLOCK0_PHASE_MASK   (0x00007c00)
-#define SPFI_CS0_IDLE_MASK       (0x000003e0)
-#define SPFI_DATA0_IDLE_MASK     (0x0000001f)
+#define SPFI_CLOCK0_IDLE_MASK		0x000f8000
+#define SPFI_CLOCK0_PHASE_MASK		0x00007c00
+#define SPFI_CS0_IDLE_MASK		0x000003e0
+#define SPFI_DATA0_IDLE_MASK		0x0000001f
 
-#define SPIM_CLOCK0_IDLE_MASK    (0x000f8000)
-#define SPIM_CLOCK0_PHASE_MASK   (0x00007c00)
-#define SPIM_CS0_IDLE_MASK       (0x000003e0)
-#define SPIM_DATA0_IDLE_MASK     (0x0000001f)
+#define SPIM_CLOCK0_IDLE_MASK		0x000f8000
+#define SPIM_CLOCK0_PHASE_MASK		0x00007c00
+#define SPIM_CS0_IDLE_MASK		0x000003e0
+#define SPIM_DATA0_IDLE_MASK		0x0000001f
 
-#define SPIM_PORT0_MASK          (0x00084210)
+#define SPIM_PORT0_MASK			0x00084210
 
-#define SPFI_PORT_SELECT_SHIFT           (20)
+#define SPFI_PORT_SELECT_SHIFT		20
 /* WARNING the following bits are reversed, bit 0 is highest */
-#define SPFI_CLOCK0_IDLE_SHIFT           (19)
-#define SPFI_CLOCK0_PHASE_SHIFT          (14)
-#define SPFI_CS0_IDLE_SHIFT               (9)
-#define SPFI_DATA0_IDLE_SHIFT             (4)
+#define SPFI_CLOCK0_IDLE_SHIFT		19
+#define SPFI_CLOCK0_PHASE_SHIFT		14
+#define SPFI_CS0_IDLE_SHIFT		9
+#define SPFI_DATA0_IDLE_SHIFT		4
 
-#define SPIM_CLOCK0_IDLE_SHIFT           (19)
-#define SPIM_CLOCK0_PHASE_SHIFT          (14)
-#define SPIM_CS0_IDLE_SHIFT               (9)
-#define SPIM_DATA0_IDLE_SHIFT             (4)
+#define SPIM_CLOCK0_IDLE_SHIFT		19
+#define SPIM_CLOCK0_PHASE_SHIFT		14
+#define SPIM_CS0_IDLE_SHIFT		9
+#define SPIM_DATA0_IDLE_SHIFT		4
 
 /*
  * Interrupt registers
  * SPFI_GDOF_MASK means Rx buffer full, not an overflow, because clock stalls
  * SPFI_SDUF_MASK means Tx buffer empty, not an underflow, because clock stalls
  */
-#define SPFI_IACCESS_MASK        (0x00001000)
-#define SPFI_GDEX8BIT_MASK       (0x00000800)
-#define SPFI_ALLDONE_MASK        (0x00000200)
-#define SPFI_GDFUL_MASK          (0x00000100)
-#define SPFI_GDHF_MASK           (0x00000080)
-#define SPFI_GDEX32BIT_MASK      (0x00000040)
-#define SPFI_GDTRIG_MASK         (0x00000020)
-#define SPFI_SDFUL_MASK          (0x00000008)
-#define SPFI_SDHF_MASK           (0x00000004)
-#define SPFI_SDE_MASK            (0x00000002)
-#define SPFI_SDTRIG_MASK         (0x00000001)
+#define SPFI_IACCESS_MASK	0x00001000
+#define SPFI_GDEX8BIT_MASK	0x00000800
+#define SPFI_ALLDONE_MASK	0x00000200
+#define SPFI_GDFUL_MASK		0x00000100
+#define SPFI_GDHF_MASK		0x00000080
+#define SPFI_GDEX32BIT_MASK	0x00000040
+#define SPFI_GDTRIG_MASK	0x00000020
+#define SPFI_SDFUL_MASK		0x00000008
+#define SPFI_SDHF_MASK		0x00000004
+#define SPFI_SDE_MASK		0x00000002
+#define SPFI_SDTRIG_MASK	0x00000001
 
-#define SPFI_IACCESS_SHIFT               (12)
-#define SPFI_GDEX8BIT_SHIFT              (11)
-#define SPFI_ALLDONE_SHIFT                (9)
-#define SPFI_GDFUL_SHIFT                  (8)
-#define SPFI_GDHF_SHIFT                   (7)
-#define SPFI_GDEX32BIT_SHIFT              (6)
-#define SPFI_GDTRIG_SHIFT                 (5)
-#define SPFI_SDFUL_SHIFT                  (3)
-#define SPFI_SDHF_SHIFT                   (2)
-#define SPFI_SDE_SHIFT                    (1)
-#define SPFI_SDTRIG_SHIFT                 (0)
+#define SPFI_IACCESS_SHIFT		12
+#define SPFI_GDEX8BIT_SHIFT		11
+#define SPFI_ALLDONE_SHIFT		9
+#define SPFI_GDFUL_SHIFT		8
+#define SPFI_GDHF_SHIFT			7
+#define SPFI_GDEX32BIT_SHIFT		6
+#define SPFI_GDTRIG_SHIFT		5
+#define SPFI_SDFUL_SHIFT		3
+#define SPFI_SDHF_SHIFT			2
+#define SPFI_SDE_SHIFT			1
+#define SPFI_SDTRIG_SHIFT		0
 
 /* SPFI register block */
-#define SPFI_PORT_0_PARAM_REG_OFFSET             (0x00)
-#define SPFI_PORT_1_PARAM_REG_OFFSET             (0x04)
-#define SPFI_PORT_2_PARAM_REG_OFFSET             (0x08)
-#define SPFI_PORT_3_PARAM_REG_OFFSET             (0x0C)
-#define SPFI_PORT_4_PARAM_REG_OFFSET             (0x10)
-#define SPFI_CONTROL_REG_OFFSET                  (0x14)
-#define SPFI_TRANSACTION_REG_OFFSET              (0x18)
-#define SPFI_PORT_STATE_REG_OFFSET               (0x1C)
+#define SPFI_PORT_0_PARAM_REG_OFFSET		0x00
+#define SPFI_PORT_1_PARAM_REG_OFFSET		0x04
+#define SPFI_PORT_2_PARAM_REG_OFFSET		0x08
+#define SPFI_PORT_3_PARAM_REG_OFFSET		0x0C
+#define SPFI_PORT_4_PARAM_REG_OFFSET		0x10
+#define SPFI_CONTROL_REG_OFFSET			0x14
+#define SPFI_TRANSACTION_REG_OFFSET		0x18
+#define SPFI_PORT_STATE_REG_OFFSET		0x1C
 
-#define SPFI_SEND_LONG_REG_OFFSET                (0x20)
-#define SPFI_SEND_BYTE_REG_OFFSET                (0x24)
-#define SPFI_GET_LONG_REG_OFFSET                 (0x28)
-#define SPFI_GET_BYTE_REG_OFFSET                 (0x2C)
+#define SPFI_SEND_LONG_REG_OFFSET		0x20
+#define SPFI_SEND_BYTE_REG_OFFSET		0x24
+#define SPFI_GET_LONG_REG_OFFSET		0x28
+#define SPFI_GET_BYTE_REG_OFFSET		0x2C
 
-#define SPFI_INT_STATUS_REG_OFFSET               (0x30)
-#define SPFI_INT_ENABLE_REG_OFFSET               (0x34)
-#define SPFI_INT_CLEAR_REG_OFFSET                (0x38)
+#define SPFI_INT_STATUS_REG_OFFSET		0x30
+#define SPFI_INT_ENABLE_REG_OFFSET		0x34
+#define SPFI_INT_CLEAR_REG_OFFSET		0x38
 
-#define SPFI_IMMEDIATE_STATUS_REG_OFFSET         (0x3c)
+#define SPFI_IMMEDIATE_STATUS_REG_OFFSET	0x3c
 
-#define SPFI_FLASH_BASE_ADDRESS_REG_OFFSET       (0x48)
-#define SPFI_FLASH_STATUS_REG_OFFSET             (0x4C)
+#define SPFI_FLASH_BASE_ADDRESS_REG_OFFSET	0x48
+#define SPFI_FLASH_STATUS_REG_OFFSET		0x4C
 
 #define IMG_FALSE				0
 #define IMG_TRUE				1
@@ -230,11 +230,11 @@ static inline void gpio_direction_output(unsigned int pin)
 /* Number of chip select lines supported by the SPI master port. */
 #define SPIM_NUM_PORTS_PER_BLOCK		(SPIM_DUMMY_CS)
 /* Maximum transfer size (in bytes) for the SPI master port. */
-#define SPIM_MAX_TRANSFER_BYTES			(0xFFFF)
+#define SPIM_MAX_TRANSFER_BYTES			0xFFFF
 /* Maximum size of a flash command: command bytes+address_bytes. */
-#define SPIM_MAX_FLASH_COMMAND_BYTES		(0x8)
+#define SPIM_MAX_FLASH_COMMAND_BYTES		0x8
 /* Write operation to fifo done in blocks of 16 words (64 bytes) */
-#define SPIM_MAX_BLOCK_BYTES			(0x40)
+#define SPIM_MAX_BLOCK_BYTES			0x40
 /* Microseconds until timeout is returned */
 #define SPI_TIMEOUT_VALUE_MS			500
 /* Maximum bytes pending */
