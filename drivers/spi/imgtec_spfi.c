@@ -410,7 +410,7 @@ static int spim_io(struct spi_slave *slave, void *din,
 {
 	struct imgtec_spi_slave *bus;
 	unsigned int tx, rx;
-	int both_hf, either_hf, incoming;
+	int both_hf, either_hf, incoming, transferred = 0;
 	uint32_t reg, status = 0, data, base;
 	unsigned long deadline = get_timer(0) + SPI_TIMEOUT_VALUE_MS;
 
@@ -445,10 +445,15 @@ static int spim_io(struct spi_slave *slave, void *din,
 
 	/* We send/receive as long as we still have data available */
 	while ((tx < bytes) || (rx < bytes)) {
-		/* If we exceed the allocated time we return with timeout */
-		if (get_timer(0) > deadline)
+		/*
+		 * If we exceed the allocated time we return with timeout
+		 * The get_timer function is time consuming so call it only if
+		 * no bytes were transferred in the previous iteration
+		 */
+		if (!transferred && (get_timer(0) > deadline))
 			return -SPIM_TIMEOUT_ERROR;
 
+		transferred = 0;
 		/* Store the current state of the INT status register */
 		status = readl(base + SPFI_INT_STATUS_REG_OFFSET);
 
@@ -477,6 +482,7 @@ static int spim_io(struct spi_slave *slave, void *din,
 				writel(data, base + SPFI_SEND_BYTE_REG_OFFSET);
 				tx++;
 			}
+			transferred = 1;
 		}
 		/*
 		 * Drain RX unless neither RX or TX are half full,
@@ -504,6 +510,7 @@ static int spim_io(struct spi_slave *slave, void *din,
 				writel(SPFI_GDEX8BIT_MASK, base +
 					SPFI_INT_CLEAR_REG_OFFSET);
 			}
+			transferred = 1;
 		}
 	}
 
