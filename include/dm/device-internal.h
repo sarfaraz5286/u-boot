@@ -11,6 +11,9 @@
 #ifndef _DM_DEVICE_INTERNAL_H
 #define _DM_DEVICE_INTERNAL_H
 
+#include <fdtdec.h>
+#include <dm/platdata.h>
+
 struct udevice;
 
 /**

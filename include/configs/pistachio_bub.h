@@ -67,6 +67,9 @@
 /*
  * Console configuration
  */
+#ifdef CONFIG_SYS_PROMPT
+#undef CONFIG_SYS_PROMPT
+#endif
 #define CONFIG_SYS_PROMPT		"pistachio # "
 
 #define CONFIG_SYS_CBSIZE		256
@@ -172,7 +175,6 @@
 /* NAND pattitions */
 #define CONFIG_LZO
 #define CONFIG_RBTREE
-#define CONFIG_CMD_JFFS2
 #define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
@@ -288,15 +290,12 @@
 #define HASH_BASE_ADDRESS		0x18149600
 #define HASH_WRITE_PORT			0x18101100
 
-/*
- * Commands
- */
-#include <config_cmd_default.h>
-
 #undef CONFIG_CMD_FPGA
 #undef CONFIG_CMD_LOADB
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_NFS
+#undef CONFIG_CMD_IMLS
+#undef CONFIG_CMD_XIMG
 
 #define CONFIG_CMD_ELF
 
