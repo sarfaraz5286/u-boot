@@ -12,8 +12,6 @@
 #include <linux/mtd/mtd.h>
 #include <linux/mtd/nand.h>
 
-#define BIT(x)			(1 << (x))
-
 struct spi_nand {
 	struct mtd_info		*mtd;
 	struct nand_chip	nand_chip;

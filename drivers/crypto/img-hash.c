@@ -17,8 +17,6 @@
 #include <malloc.h>
 #include <mapmem.h>
 
-#define BIT(nr)				(1UL << (nr))
-
 #define CR_RESET			0
 #define CR_RESET_SET			1
 #define CR_RESET_UNSET			0
