@@ -246,6 +246,19 @@
 	"ubifsload $fdtaddr $bootdir$fdtfile;"				\
 	"bootm $loadaddr - $fdtaddr;"
 
+/*
+ * Update stress test procedure
+ * This should only be used with the automatic stress test process from Jenkins
+ * or using the danube/test project to set it up.
+ */
+#define STRESS_TEST_UPDATE						\
+	"mw.b $u_memload 0xFF $u_memsize;"				\
+	"setenv kernelimg $bootfile;"					\
+	"dhcp $u_memload $u_rootfs;"					\
+	"setenv bootfile $kernelimg;"					\
+	"nand erase.chip;"						\
+	"nand write $u_memload 0 $u_memsize;"
+
 #ifndef NAND_BOOT
 
 #define CONFIG_BOOTCOMMAND	USB_BOOTCOMMAND
@@ -275,6 +288,10 @@
 	"mmcboot="MMC_BOOTCOMMAND"\0"					\
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
 	"ethboot="ETH_BOOTCOMMAND"\0"					\
+	"u_memload=0x00800000\0"					\
+	"u_memsize=0x08000000\0"					\
+	"u_rootfs=rootfs.ubi\0"						\
+	"stress_test_update="STRESS_TEST_UPDATE"\0"			\
 	"\0"
 
 #define CONFIG_BOOTDELAY    2
