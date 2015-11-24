@@ -253,15 +253,27 @@
 	"ext4load mmc $mmcdev $loadaddr $bootdir$bootfile;"		\
 	"bootm $loadaddr - $fdtaddr;"
 
-#define NAND_BOOTCOMMAND						\
-	"sf probe 1:0;"                                                 \
-	"mtdparts default;"                                             \
-	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;" 	\
-	"setenv verify n;"						\
+#define NAND_BOOTCOMMAND							\
+	"sf probe 1:0;"								\
+	"mtdparts default;"							\
+	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;"	\
+	"setenv verify n;"							\
 	"ubi part firmware0;"						\
-	"ubifsmount ubi:rootfs;"					\
-	"ubifsload $loadaddr $bootdir$bootfile;"			\
-	"ubifsload $fdtaddr $bootdir$fdtfile;"				\
+	"ubifsmount ubi:rootfs;"						\
+	"ubifsload $loadaddr $bootdir$bootfile;"				\
+	"ubifsload $fdtaddr $bootdir$fdtfile;"					\
+	"bootm $loadaddr - $fdtaddr;"
+
+#define DUAL_NAND_BOOTCOMMAND							\
+	"sf probe 1:0;"								\
+	"mtdparts default;"							\
+	"setenv nandroot ubi.mtd=firmware${boot_partition} root=ubi0:rootfs rootfstype=ubifs;"	\
+	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;"	\
+	"setenv verify n;"							\
+	"ubi part firmware${boot_partition};"						\
+	"ubifsmount ubi:rootfs;"						\
+	"ubifsload $loadaddr $bootdir$bootfile;"				\
+	"ubifsload $fdtaddr $bootdir$fdtfile;"					\
 	"bootm $loadaddr - $fdtaddr;"
 
 #define NET_BOOTCOMMAND										\
@@ -270,45 +282,12 @@
 	"setenv bootargs $console $earlycon $netroot nfsroot=$serverip:$rootpath $bootextra $mtdparts;"	\
 	ETH_BOOTCOMMAND
 
-/*
- * Update stress test procedure
- * This should only be used with the automatic stress test process from Jenkins
- * or using the danube/test project to set it up.
- * It will rely on files found on iw-rpi-7 (192.168.167.128) for update
- * If this is not set up, the update will be unsuccesful
- */
-#define STRESS_TEST_UPDATE						\
-	"mw.b $u_memload 0xFF $u_memsize;"				\
-	"setenv ethaddr $u_ethaddr;"					\
-	"setenv serverip $u_server;"					\
-	"setenv kernelimg $bootfile;"					\
-	"if dhcp $u_memload $u_rootfs; then "				\
-	"nand erase.chip;"						\
-	"nand write $u_memload 0 $u_memsize; fi; "			\
-	"setenv bootfile $kernelimg;"
-
-#ifdef STRESS_TEST
-#define BOOT_EXTRA "rootwait ro lpj=723968 kmemleak=on"
-#else
 #define BOOT_EXTRA "rootwait ro lpj=723968"
-#endif
 
 #ifndef NAND_BOOT
-
 #define CONFIG_BOOTCOMMAND	USB_BOOTCOMMAND
-
 #else
-
-#ifdef STRESS_TEST
-
-#define CONFIG_BOOTCOMMAND	STRESS_TEST_UPDATE";"NAND_BOOTCOMMAND
-
-#else
-
-#define CONFIG_BOOTCOMMAND	NAND_BOOTCOMMAND
-
-#endif
-
+#define CONFIG_BOOTCOMMAND	DUAL_NAND_BOOTCOMMAND
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
@@ -318,6 +297,7 @@
 	"rootpath=/srv/fs\0"						\
 	"usbroot=root=/dev/sda1\0"					\
 	"mmcroot=root=/dev/mmcblk0p1\0"					\
+	"boot_partition=0\0"							\
 	"nandroot=ubi.mtd=4 root=ubi0:rootfs rootfstype=ubifs\0"	\
 	"netroot=root=/dev/nfs rootfstype=nfs ip=dhcp\0"		\
 	"fdtaddr=0x0D000000\0"						\
@@ -333,12 +313,7 @@
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
 	"ethboot="ETH_BOOTCOMMAND"\0"					\
 	"netboot="NET_BOOTCOMMAND"\0"					\
-	"u_memload=0x00800000\0"					\
-	"u_memsize=0x08000000\0"					\
-	"u_ethaddr=62:5f:8c:ec:6a:ce\0"					\
-	"u_server=192.168.167.128\0"					\
-	"u_rootfs=rootfs.ubi\0"						\
-	"stress_test_update="STRESS_TEST_UPDATE"\0"			\
+	"dualnandboot="DUAL_NAND_BOOTCOMMAND"\0"		\
 	"\0"
 
 #define CONFIG_BOOTDELAY    2
