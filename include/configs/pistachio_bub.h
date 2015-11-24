@@ -249,15 +249,27 @@
 	"ext4load mmc $mmcdev $loadaddr $bootdir$bootfile;"		\
 	"bootm $loadaddr - $fdtaddr;"
 
-#define NAND_BOOTCOMMAND						\
-	"sf probe 1:0;"                                                 \
-	"mtdparts default;"                                             \
-	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;" 	\
-	"setenv verify n;"						\
+#define NAND_BOOTCOMMAND							\
+	"sf probe 1:0;"								\
+	"mtdparts default;"							\
+	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;"	\
+	"setenv verify n;"							\
 	"ubi part firmware0;"						\
-	"ubifsmount ubi:rootfs;"					\
-	"ubifsload $loadaddr $bootdir$bootfile;"			\
-	"ubifsload $fdtaddr $bootdir$fdtfile;"				\
+	"ubifsmount ubi:rootfs;"						\
+	"ubifsload $loadaddr $bootdir$bootfile;"				\
+	"ubifsload $fdtaddr $bootdir$fdtfile;"					\
+	"bootm $loadaddr - $fdtaddr;"
+
+#define DUAL_NAND_BOOTCOMMAND							\
+	"sf probe 1:0;"								\
+	"mtdparts default;"							\
+	"setenv nandroot ubi.mtd=firmware${boot_partition} root=ubi0:rootfs rootfstype=ubifs;"	\
+	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;"	\
+	"setenv verify n;"							\
+	"ubi part firmware${boot_partition};"						\
+	"ubifsmount ubi:rootfs;"						\
+	"ubifsload $loadaddr $bootdir$bootfile;"				\
+	"ubifsload $fdtaddr $bootdir$fdtfile;"					\
 	"bootm $loadaddr - $fdtaddr;"
 
 #define NET_BOOTCOMMAND										\
@@ -287,7 +299,7 @@
 
 #else
 
-#define CONFIG_BOOTCOMMAND	NAND_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND	DUAL_NAND_BOOTCOMMAND
 
 #endif
 
@@ -298,6 +310,7 @@
 	"rootpath=/srv/fs\0"						\
 	"usbroot=root=/dev/sda1\0"					\
 	"mmcroot=root=/dev/mmcblk0p1\0"					\
+	"boot_partition=0\0"							\
 	"nandroot=ubi.mtd=4 root=ubi0:rootfs rootfstype=ubifs\0"	\
 	"netroot=root=/dev/nfs rootfstype=nfs ip=dhcp\0"		\
 	"fdtaddr=0x0D000000\0"						\
@@ -313,6 +326,7 @@
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
 	"ethboot="ETH_BOOTCOMMAND"\0"					\
 	"netboot="NET_BOOTCOMMAND"\0"					\
+	"dualnandboot="DUAL_NAND_BOOTCOMMAND"\0"		\
 	"u_memload=0x00800000\0"					\
 	"u_memsize=0x08000000\0"					\
 	"u_rootfs=rootfs.ubi\0"						\
