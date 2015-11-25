@@ -322,7 +322,7 @@
 	"netroot=root=/dev/nfs rootfstype=nfs ip=dhcp\0"		\
 	"fdtaddr=0x0D000000\0"						\
 	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\
-	"bootfile=uImage.bin\0"						\
+	"bootfile=uImage\0"						\
 	"loadaddr=0x0E000000\0"						\
 	"bootdir=/\0"							\
 	"usbdev=0\0"							\
