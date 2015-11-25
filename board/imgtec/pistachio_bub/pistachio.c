@@ -160,6 +160,8 @@ int board_mmc_init(bd_t *bis)
 
 void _machine_restart(void)
 {
+	// Generate system reset
+	writel(0x1, PISTACHIO_WD + 0x0000);
 }
 
 int board_early_init_f(void)
