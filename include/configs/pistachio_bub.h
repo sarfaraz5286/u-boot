@@ -237,7 +237,7 @@
 	"bootm $loadaddr - $fdtaddr;"
 
 #define NAND_BOOTCOMMAND						\
-	"setenv bootargs $console $earlycon $nandroot ro;" 		\
+	"setenv bootargs $console $earlycon $nandroot $bootextra;" 	\
 	"setenv verify n;"						\
 	"mtdparts default;"						\
 	"ubi part rootfs;"						\
