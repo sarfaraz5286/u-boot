@@ -240,7 +240,7 @@
 	"bootm $loadaddr - $fdtaddr;"
 
 #define NAND_BOOTCOMMAND						\
-	"setenv bootargs $console $earlycon $nandroot ro;" 		\
+	"setenv bootargs $console $earlycon $nandroot $bootextra;" 	\
 	"setenv verify n;"						\
 	"mtdparts default;"						\
 	"ubi part rootfs;"						\
@@ -266,6 +266,12 @@
 	"nand erase.chip;"						\
 	"nand write $u_memload 0 $u_memsize;"
 
+#ifdef STRESS_TEST
+#define BOOT_EXTRA "rootwait ro kmemleak=on"
+#else
+#define BOOT_EXTRA "rootwait ro"
+#endif
+
 #ifndef NAND_BOOT
 
 #define CONFIG_BOOTCOMMAND	USB_BOOTCOMMAND
@@ -287,7 +293,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS 					\
 	"console=console=ttyS1,115200n8\0" 				\
 	"earlycon=earlycon=uart8250,mmio32,0x18101500,115200\0" 	\
-	"bootextra=rootwait ro\0"					\
+	"bootextra="BOOT_EXTRA"\0"					\
 	"usbroot=root=/dev/sda1\0"					\
 	"mmcroot=root=/dev/mmcblk0p1\0"					\
 	"nandroot=ubi.mtd=1 root=ubi0:rootfs rootfstype=ubifs\0"	\
