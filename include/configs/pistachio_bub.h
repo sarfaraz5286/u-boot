@@ -261,10 +261,10 @@
 	"setenv ethaddr $u_ethaddr;"					\
 	"setenv serverip $u_server;"					\
 	"setenv kernelimg $bootfile;"					\
-	"dhcp $u_memload $u_rootfs;"					\
-	"setenv bootfile $kernelimg;"					\
+	"if dhcp $u_memload $u_rootfs; then "				\
 	"nand erase.chip;"						\
-	"nand write $u_memload 0 $u_memsize;"
+	"nand write $u_memload 0 $u_memsize; fi; "			\
+	"setenv bootfile $kernelimg;"
 
 #ifdef STRESS_TEST
 #define BOOT_EXTRA "rootwait ro kmemleak=on"
