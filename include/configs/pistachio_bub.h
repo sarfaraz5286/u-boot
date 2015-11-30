@@ -252,12 +252,14 @@
  * or using the danube/test project to set it up.
  */
 #define STRESS_TEST_UPDATE						\
+	"setenv bootextra rootwait ro kmemleak=on;"			\
 	"mw.b $u_memload 0xFF $u_memsize;"				\
 	"setenv kernelimg $bootfile;"					\
-	"dhcp $u_memload $u_rootfs;"					\
-	"setenv bootfile $kernelimg;"					\
+	"if dhcp $u_memload $u_rootfs; then "				\
 	"nand erase.chip;"						\
-	"nand write $u_memload 0 $u_memsize;"
+	"nand write $u_memload 0 $u_memsize; fi; "			\
+	"setenv bootfile $kernelimg;"					\
+	NAND_BOOTCOMMAND
 
 #ifndef NAND_BOOT
 
