@@ -64,6 +64,8 @@
 #define CONFIG_SYS_BOOTPARAMS_LEN	(128 * 1024)
 #define CONFIG_SYS_BOOTM_LEN		(64 * 1024 * 1024)
 
+#define CONFIG_BOOTCOUNT_LIMIT
+
 /*
  * Console configuration
  */
@@ -256,6 +258,7 @@
 #define NAND_BOOTCOMMAND							\
 	"sf probe 1:0;"								\
 	"mtdparts default;"							\
+	"setenv nandroot ubi.mtd=firmware0 root=ubi0:rootfs rootfstype=ubifs;" \
 	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;"	\
 	"setenv verify n;"							\
 	"ubi part firmware0;"						\
@@ -268,13 +271,40 @@
 	"sf probe 1:0;"								\
 	"mtdparts default;"							\
 	"setenv nandroot ubi.mtd=firmware${boot_partition} root=ubi0:rootfs rootfstype=ubifs;"	\
-	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts;"	\
+	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts panic=2;"	\
 	"setenv verify n;"							\
 	"ubi part firmware${boot_partition};"						\
 	"ubifsmount ubi:rootfs;"						\
 	"ubifsload $loadaddr $bootdir$bootfile;"				\
 	"ubifsload $fdtaddr $bootdir$fdtfile;"					\
 	"bootm $loadaddr - $fdtaddr;"
+
+#ifdef CONFIG_BOOTCOUNT_LIMIT
+
+#define CONFIG_SYS_BOOTCOUNT_ADDR	0x18102120
+
+#define ALT_BOOTCOMMAND							\
+	"if test ${attempt_upgrade} -eq 1; then "        \
+		"if test ${boot_partition} -eq 0; then "        \
+			"setenv boot_partition 1;"      \
+		"else " \
+			"setenv boot_partition 0;"      \
+		"fi;" \
+		"setenv attempt_upgrade 0;"			\
+		"saveenv;"      \
+	"fi;"   \
+	DUAL_NAND_BOOTCOMMAND
+
+#define BOOTCOUNT_VARIABLES			\
+	"bootlimit=5\0"				\
+	"attempt_upgrade=0\0"			\
+	"altbootcmd="ALT_BOOTCOMMAND"\0"
+
+#else
+
+#define BOOTCOUNT_VARIABLES ""
+
+#endif
 
 #define NET_BOOTCOMMAND										\
 	"sf probe 1:0;"                                                 \
@@ -297,8 +327,7 @@
 	"rootpath=/srv/fs\0"						\
 	"usbroot=root=/dev/sda1\0"					\
 	"mmcroot=root=/dev/mmcblk0p1\0"					\
-	"boot_partition=0\0"							\
-	"nandroot=ubi.mtd=4 root=ubi0:rootfs rootfstype=ubifs\0"	\
+	"boot_partition=0\0"						\
 	"netroot=root=/dev/nfs rootfstype=nfs ip=dhcp\0"		\
 	"fdtaddr=0x0D000000\0"						\
 	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\
@@ -313,7 +342,8 @@
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
 	"ethboot="ETH_BOOTCOMMAND"\0"					\
 	"netboot="NET_BOOTCOMMAND"\0"					\
-	"dualnandboot="DUAL_NAND_BOOTCOMMAND"\0"		\
+	"dualnandboot="DUAL_NAND_BOOTCOMMAND"\0"			\
+	BOOTCOUNT_VARIABLES						\
 	"\0"
 
 #define CONFIG_BOOTDELAY    2
