@@ -151,7 +151,7 @@ int board_mmc_init(bd_t *bis)
 	host->ioaddr = (void *)0x18142000;
 	host->buswidth = 4;
 	host->dev_index = 0;
-	host->bus_hz = 200000000;
+	host->bus_hz = 87500000;
 
 	add_dwmci(host, host->bus_hz, 25000000);
 
