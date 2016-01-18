@@ -226,6 +226,10 @@
 #define CONFIG_ENV_SPI_BUS		1
 #define CONFIG_ENV_SPI_CS		0
 
+#define UPGRADE_CHECK_RESET 							\
+	"if test ${attempt_upgrade} -eq 1; then "       	\
+		"reset; "										\
+	"fi;"
 #define USB_BOOTCOMMAND							\
 	"sf probe 1:0;"                                                 \
 	"mtdparts default;"                                             \
@@ -270,10 +274,14 @@
 	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts panic=2;"	\
 	"setenv verify n;"							\
 	"ubi part firmware${boot_partition};"						\
-	"ubifsmount ubi:rootfs;"						\
-	"ubifsload $loadaddr $bootdir$bootfile;"				\
-	"ubifsload $fdtaddr $bootdir$fdtfile;"					\
-	"bootm $loadaddr - $fdtaddr;"
+	"setenv ubifs_bootm_cmd \"ubifsmount ubi:rootfs && "				\
+	"ubifsload $loadaddr $bootdir$bootfile && "					\
+	"ubifsload $fdtaddr $bootdir$fdtfile && " 					\
+	"bootm $loadaddr - $fdtaddr\";"								\
+	"run ubifs_bootm_cmd"
+
+#define DUAL_NAND_BOOTCOMMAND_RESET				\
+	DUAL_NAND_BOOTCOMMAND " || " UPGRADE_CHECK_RESET
 
 #ifdef CONFIG_BOOTCOUNT_LIMIT
 
@@ -329,7 +337,7 @@
 
 #else
 
-#define CONFIG_BOOTCOMMAND	DUAL_NAND_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND	DUAL_NAND_BOOTCOMMAND_RESET
 
 #endif
 
@@ -355,7 +363,7 @@
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
 	"ethboot="ETH_BOOTCOMMAND"\0"					\
 	"netboot="NET_BOOTCOMMAND"\0"					\
-	"dualnandboot="DUAL_NAND_BOOTCOMMAND"\0"			\
+	"dualnandboot="DUAL_NAND_BOOTCOMMAND_RESET"\0"			\
 	BOOTCOUNT_VARIABLES						\
 	"u_memload=0x00800000\0"					\
 	"u_memsize=0x08000000\0"					\
