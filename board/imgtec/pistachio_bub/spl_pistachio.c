@@ -11,7 +11,6 @@
 #include <common.h>
 #include <linux/sizes.h>
 #include <spl.h>
-
 #include "clocks.h"
 #include "ddr_init.h"
 #include "mfio.h"
@@ -78,6 +77,9 @@ void spl_lowlevel_init(void) {
 	eth_clk_setup(0, 6);
 	rom_clk_setup(1);
 	usb_clk_setup(6, 2, 7);
+#ifdef CONFIG_PISTACHIO_WATCHDOG
+	wd_clk_setup(87, 120);
+#endif
 #if defined(CONFIG_TARGET_PISTACHIO_MARDUK) || \
 	defined(CONFIG_TARGET_PISTACHIO_BEETLE)
 	mfio_setup_usb_pwr();

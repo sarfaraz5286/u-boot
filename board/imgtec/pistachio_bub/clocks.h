@@ -25,6 +25,9 @@ int usb_clk_setup(u8 divider, u8 refclksel, u8 fsel);
 void rom_clk_setup(u8 divider);
 void eth_clk_setup(u8 mux, u8 divider);
 void setup_clk_gate_defaults(void);
+#ifdef CONFIG_PISTACHIO_WATCHDOG
+void wd_clk_setup(u8 divider1, u16 divider2);
+#endif /*CONFIG_PISTACHIO_WATCHDOG*/
 
 enum {
 	CLOCKS_OK = 0,

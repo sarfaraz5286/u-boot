@@ -128,6 +128,11 @@
 #define USB_TIMEOUT_VALUE_US		200000
 #define SYS_CLK_LOCK_DELAY		3
 
+/* Definitions for Watchdog setup */
+#define WDCLKDIV1_CTRL_ADDR		(0x18144800 + 0x0124)
+#define WDCLKDIV1_MASK			0x0000007F
+#define WDCLKOUT_CTRL_ADDR		(0x18144800 + 0x0128)
+#define WDCLKOUT_MASK			0x0000007F
 
 #ifdef CONFIG_SPL_BUILD
 struct pll_parameters {
@@ -517,4 +522,32 @@ void i2c_clk_setup(u8 divider1, u16 divider2, u8 interface)
 	reg |= divider2 & I2CCLKOUT_MASK;
 	writel(reg, I2CCLKOUT_CTRL_ADDR(interface));
 }
+
+/*
+ * wd_clk_setup: sets up clocks for pistachio watchdog
+ * divider1: 7-bit divider value
+ * divider2: 7-bit divider value
+ */
+#ifdef CONFIG_PISTACHIO_WATCHDOG
+void wd_clk_setup(u8 divider1, u16 divider2)
+{
+	u32 reg;
+
+	/* Check input parameters */
+	assert(!(divider1 & ~(WDCLKDIV1_MASK)));
+	assert(!(divider2 & ~(WDCLKOUT_MASK)));
+
+	/* Set divider 1 */
+	reg = readl(WDCLKDIV1_CTRL_ADDR);
+	reg &= ~WDCLKDIV1_MASK;
+	reg |= divider1 & WDCLKDIV1_MASK;
+	writel(reg, WDCLKDIV1_CTRL_ADDR);
+
+	/* Set divider 2 */
+	reg = readl(WDCLKOUT_CTRL_ADDR);
+	reg &= ~WDCLKOUT_MASK;
+	reg |= divider2 & WDCLKOUT_MASK;
+	writel(reg, WDCLKOUT_CTRL_ADDR);
+}
+#endif /*CONFIG_PISTACHIO_WATCHDOG*/
 #endif
