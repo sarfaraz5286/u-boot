@@ -19,6 +19,7 @@
 #include <asm/mipsregs.h>
 #include <asm/pistachio.h>
 #include <asm-generic/sections.h>
+#include <watchdog.h>
 
 #include "mfio.h"
 
@@ -166,6 +167,14 @@ void _machine_restart(void)
 
 int board_early_init_f(void)
 {
+	return 0;
+}
+
+int board_late_init(void)
+{
+#ifdef CONFIG_PISTACHIO_WATCHDOG
+	hw_watchdog_init();
+#endif
 	return 0;
 }
 
