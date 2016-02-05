@@ -755,14 +755,14 @@ int  spi_xfer(struct spi_slave *slave, unsigned int bitlen, const void *dout,
 		bytes = bitlen / 8;
 	}
 
-	/* Start the transaction, if necessary. */
-	if ((flags & SPI_XFER_BEGIN))
-		spi_cs_activate(slave);
-
-	if (!dout && !din) {
+	if (!dout && !din && (bitlen != 0)) {
 		printf("%s: Error: both buffers are NULL.\n", __func__);
 		return -SPIM_INVALID_TRANSFER_DESC;
 	}
+
+	/* Start the transaction, if necessary. */
+	if ((flags & SPI_XFER_BEGIN))
+		spi_cs_activate(slave);
 
 	/*
 	 * Transfers with size bigger than
