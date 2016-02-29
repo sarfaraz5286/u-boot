@@ -226,10 +226,8 @@
 #define CONFIG_ENV_SPI_BUS		1
 #define CONFIG_ENV_SPI_CS		0
 
-#define UPGRADE_CHECK_RESET 							\
-	"if test ${attempt_upgrade} -eq 1; then "       	\
-		"reset; "										\
-	"fi;"
+#define CONFIG_CMD_SETEXPR
+
 #define USB_BOOTCOMMAND							\
 	"sf probe 1:0;"                                                 \
 	"mtdparts default;"                                             \
@@ -278,30 +276,31 @@
 	"ubifsload $loadaddr $bootdir$bootfile && "					\
 	"ubifsload $fdtaddr $bootdir$fdtfile && " 					\
 	"bootm $loadaddr - $fdtaddr\";"								\
-	"run ubifs_bootm_cmd"
-
-#define DUAL_NAND_BOOTCOMMAND_RESET				\
-	DUAL_NAND_BOOTCOMMAND " || " UPGRADE_CHECK_RESET
+	"run ubifs_bootm_cmd || reset;"
 
 #ifdef CONFIG_BOOTCOUNT_LIMIT
 
 #define CONFIG_SYS_BOOTCOUNT_ADDR	0x18102120
 
 #define ALT_BOOTCOMMAND							\
-	"if test ${attempt_upgrade} -eq 1; then "        \
-		"if test ${boot_partition} -eq 0; then "        \
-			"setenv boot_partition 1;"      \
-		"else " \
-			"setenv boot_partition 0;"      \
-		"fi;" \
-		"setenv attempt_upgrade 0;"			\
-		"saveenv;"      \
-	"fi;"   \
+	"setexpr bootcount_temp $bootcount - 1;"	\
+	"setexpr switch_partition $bootcount_temp % $bootlimit;"	\
+	"if test ${switch_partition} -eq 0; then "	\
+		"if test ${boot_partition} -eq 0; then "	\
+			"echo **Switching to partition 1;"	\
+			"setenv boot_partition 1;"	\
+		"else "	\
+			"echo **Switching to partition 0;"	\
+			"setenv boot_partition 0;"	\
+		"fi;"	\
+		"env delete bootcount_temp;"	\
+		"env delete switch_partition;"	\
+		"saveenv;"	\
+	"fi;"	\
 	DUAL_NAND_BOOTCOMMAND
 
 #define BOOTCOUNT_VARIABLES			\
 	"bootlimit=5\0"				\
-	"attempt_upgrade=0\0"			\
 	"altbootcmd="ALT_BOOTCOMMAND"\0"
 
 #else
@@ -337,7 +336,7 @@
 
 #else
 
-#define CONFIG_BOOTCOMMAND	DUAL_NAND_BOOTCOMMAND_RESET
+#define CONFIG_BOOTCOMMAND	DUAL_NAND_BOOTCOMMAND
 
 #endif
 
@@ -363,7 +362,7 @@
 	"nandboot="NAND_BOOTCOMMAND"\0"					\
 	"ethboot="ETH_BOOTCOMMAND"\0"					\
 	"netboot="NET_BOOTCOMMAND"\0"					\
-	"dualnandboot="DUAL_NAND_BOOTCOMMAND_RESET"\0"			\
+	"dualnandboot="DUAL_NAND_BOOTCOMMAND"\0"			\
 	BOOTCOUNT_VARIABLES						\
 	"u_memload=0x00800000\0"					\
 	"u_memsize=0x08000000\0"					\
