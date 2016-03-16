@@ -67,6 +67,12 @@
 #define CONFIG_BOOTCOUNT_LIMIT
 
 /*
+ * enable scratchpad_read/write command
+ * Note: scratchpad register 0 is in use for bootcount so should not be modified
+ */
+#define CONFIG_CMD_PISTACHIO_SCRATCHPAD
+
+/*
  * Console configuration
  */
 #ifdef CONFIG_SYS_PROMPT

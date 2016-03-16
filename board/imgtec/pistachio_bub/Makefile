@@ -16,3 +16,6 @@ obj-y				+= ddr3_init.o
 endif
 obj-y				+= spl_pistachio.o
 endif
+ifdef CONFIG_CMD_PISTACHIO_SCRATCHPAD
+obj-y				+= cmd_scratchpad.o
+endif
