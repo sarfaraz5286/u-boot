@@ -71,6 +71,11 @@
  * Note: scratchpad register 0 is in use for bootcount so should not be modified
  */
 #define CONFIG_CMD_PISTACHIO_SCRATCHPAD
+/*
+ * factory reset cmd just sets a value in scratchpad reg, actual
+ * reset will be done by Linux when it boots
+ */
+#define FACTORY_RESET_CMD "scratchpad_write 1 0x1234"
 
 /*
  * Console configuration
@@ -355,6 +360,7 @@
 	"netboot="NET_BOOTCOMMAND"\0"					\
 	"dualnandboot="DUAL_NAND_BOOTCOMMAND"\0"			\
 	BOOTCOUNT_VARIABLES						\
+	"factory_reset="FACTORY_RESET_CMD"\0"				\
 	"\0"
 
 #define CONFIG_BOOTDELAY    2
