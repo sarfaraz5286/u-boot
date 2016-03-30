@@ -439,7 +439,7 @@ static int spim_config(struct spi_slave *slave, unsigned int tx,
 {
 	struct imgtec_spi_slave *bus = to_imgtec_spi_slave(slave);
 	uint32_t base, reg;
-	int is_pending, ret;
+	int is_pending;
 
 	base = bus->base;
 
@@ -463,15 +463,6 @@ static int spim_config(struct spi_slave *slave, unsigned int tx,
 	} else {
 		bus->complete = 1;
 		if (is_pending) {
-			if (!tx) {
-				/* Finish pending transfer first for transmit */
-				spfi_switch(slave, 1);
-				ret = spfi_wait_all_done(slave);
-				if (ret < 0)
-					return ret;
-				spfi_switch(slave, 0);
-				reg = 0;
-			}
 			/* Keep setup from peding transfer */
 			reg = spi_write_reg_field(reg, SPFI_TSIZE, bytes);
 		} else {
@@ -491,6 +482,8 @@ static int spim_config(struct spi_slave *slave, unsigned int tx,
 							1 : 0);
 	/* Set get DMA if read transaction exists */
 	reg = spi_write_reg_field(reg, SPIM_GET_DMA, (!rx) ? 1 : 0);
+	/* Set/clear TX_RX bit for TX/RX transactions */
+	reg = spi_write_reg_field(reg, SPFI_TX_RX, !tx ? 1 : 0);
 	/* Same edge used for higher operational frequency */
 	reg = spi_write_reg_field(reg, SPIM_EDGE_TX_RX, 1);
 
