@@ -10,6 +10,7 @@
 /dts-v1/;
 
 #include "pistachio.dtsi"
+#include "pistachio_signature.dtsi"
 
 / {
 	model = "IMG Pistachio BuB";

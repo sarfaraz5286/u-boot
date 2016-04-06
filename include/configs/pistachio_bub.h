@@ -33,6 +33,25 @@
 #define CONFIG_PHYS_TO_BUS
 
 /*
+ *FIT Image
+*/
+#define CONFIG_FIT
+#ifdef CONFIG_FIT
+#define CONFIG_FIT_BEST_MATCH
+#define CONFIG_FIT_SIGNATURE
+#define CONFIG_FIT_VERBOSE
+#define CONFIG_RSA
+#define CONFIG_RSA_SOFTWARE_EXP
+#define CONFIG_IMAGE_FORMAT_LEGACY
+#define FITBOOT_VARIABLES	\
+	"fitfile=fitImage\0"	\
+	"fitconf="PISTACHIO_BOARD_NAME"_config@1\0"	\
+	"bootm_verify=y\0"
+#else
+#define FITBOOT_VARIABLES ""
+#endif
+
+/*
  * Memory map
  */
 #define CONFIG_SYS_GRAM_BASE		0x9A000000
@@ -278,18 +297,43 @@
 	"ubifsload $fdtaddr $bootdir$fdtfile;"					\
 	"bootm $loadaddr - $fdtaddr;"
 
-#define DUAL_NAND_BOOTCOMMAND							\
+#define DUAL_NAND_BOOT_INIT							\
 	"sf probe 1:0;"								\
 	"mtdparts default;"							\
 	"setenv nandroot ubi.mtd=firmware${boot_partition} root=ubi0:rootfs rootfstype=ubifs;"	\
 	"setenv bootargs $console $earlycon $nandroot $bootextra $mtdparts panic=2;"	\
-	"setenv verify n;"							\
-	"ubi part firmware${boot_partition};"						\
-	"setenv ubifs_bootm_cmd \"ubifsmount ubi:rootfs && "				\
-	"ubifsload $loadaddr $bootdir$bootfile && "					\
-	"ubifsload $fdtaddr $bootdir$fdtfile && " 					\
-	"bootm $loadaddr - $fdtaddr\";"								\
+	"setenv verify $bootm_verify;"						\
+	"ubi part firmware${boot_partition};"					\
+	"ubifsmount ubi:rootfs || reset;"
+
+#define DUAL_NAND_UIMAGE_BOOT							\
+	"setenv ubifs_bootm_cmd \"ubifsload $loadaddr $bootdir$bootfile && "	\
+	"ubifsload $fdtaddr $bootdir$fdtfile && "				\
+	"bootm $loadaddr - $fdtaddr\";"
+
+#define DUAL_NAND_FITIMAGE_BOOT							\
+	"setenv ubifs_bootm_cmd \"ubifsload $loadaddr $bootdir$fitfile && "	\
+	"bootm $loadaddr#$fitconf\";"
+
+
+#ifdef CONFIG_FIT
+/*
+ If fitImage file is found boot that,  else try uImage
+*/
+#define DUAL_NAND_BOOTCOMMAND							\
+	DUAL_NAND_BOOT_INIT							\
+	"if ubifsls $bootdir$fitfile; then "					\
+		DUAL_NAND_FITIMAGE_BOOT						\
+	"else "									\
+		DUAL_NAND_UIMAGE_BOOT						\
+	"fi;"									\
 	"run ubifs_bootm_cmd || reset;"
+#else
+#define DUAL_NAND_BOOTCOMMAND							\
+	DUAL_NAND_BOOT_INIT							\
+	DUAL_NAND_UIMAGE_BOOT							\
+	"run ubifs_bootm_cmd || reset;"
+#endif
 
 #ifdef CONFIG_BOOTCOUNT_LIMIT
 
@@ -348,6 +392,7 @@
 	"fdtaddr=0x0D000000\0"						\
 	"fdtfile="PISTACHIO_BOARD_NAME".dtb\0"				\
 	"bootfile=uImage\0"						\
+	FITBOOT_VARIABLES						\
 	"loadaddr=0x0E000000\0"						\
 	"bootdir=/\0"							\
 	"usbdev=0\0"							\
