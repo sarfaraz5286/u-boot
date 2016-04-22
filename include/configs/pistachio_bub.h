@@ -267,9 +267,9 @@
 	"setenv bootfile $kernelimg;"
 
 #ifdef STRESS_TEST
-#define BOOT_EXTRA "rootwait ro kmemleak=on"
+#define BOOT_EXTRA "rootwait ro lpj=723968 kmemleak=on"
 #else
-#define BOOT_EXTRA "rootwait ro"
+#define BOOT_EXTRA "rootwait ro lpj=723968"
 #endif
 
 #ifndef NAND_BOOT
