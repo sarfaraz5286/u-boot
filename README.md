@@ -26,4 +26,20 @@ Note: Using OpenWrt's toolchain toolchain-mipsel_mips32_gcc-5.2.0_musl-1.1.11 wi
 
 		$ reboot
 
+	Once restarted the board, you should see the date when you have built the u-boot on the console as follows:
+
+		U-Boot SPL 2015.07-rc2 (Jun 14 2016 - 19:20:36)
+		
+		
+		U-Boot 2015.07-rc2 (Jun 14 2016 - 19:20:36 +0530)
+		
+		MIPS(interAptiv): IMG Pistachio 546MHz.
+		Model: IMG Marduk
+		DRAM:  256 MiB
+		NAND:  512 MiB
+		MMC:   Synopsys Mobile storage: 0
+		SF: Detected W25Q16CL with page size 256 Bytes, erase size 4 KiB, total 2 MiB
+
+This means your built u-boot image has been flashed properly on the board!!
+
 _Please be aware that you may brick the board if you flashed a wrong bootloader. Only way to re-cover back the board is to use Dedi-prog SF100 programmer to flash the pre-built bootloader again._
