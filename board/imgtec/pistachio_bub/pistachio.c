@@ -20,6 +20,7 @@
 #include <asm/pistachio.h>
 #include <asm-generic/sections.h>
 #include <watchdog.h>
+#include <tpm.h>
 
 #include "mfio.h"
 
@@ -172,6 +173,12 @@ int board_early_init_f(void)
 
 int board_late_init(void)
 {
+#ifdef CONFIG_TPM
+	if (tpm_init() || tpm_startup(TPM_ST_CLEAR)) {
+		printf("Failed to enable tpm!\n");
+		return 1;
+	}
+#endif
 #ifdef CONFIG_PISTACHIO_WATCHDOG
 	hw_watchdog_init();
 #endif
