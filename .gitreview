@@ -1,6 +1,0 @@
-[gerrit]
-host=imgworks.imgtec.com
-port=29418
-project=danube/bootloaders/u-boot
-defaultremote=origin
-defaultbranch=pistachio_2015.10
